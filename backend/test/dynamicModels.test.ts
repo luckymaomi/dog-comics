@@ -81,6 +81,43 @@ test('PearAPI Nano Banana 各模型族按文档补全参考图上限和画幅', 
   assert.deepEqual(base?.capabilities.aspectRatios, ['9:16', '16:9', '1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '21:9']);
 });
 
+test('PearAPI Doubao Seedream 按文档补全 10 张参考图与 8 种画幅，Upscaler 单独补洞', async () => {
+  const adapter = createPearApiAdapter(async () => Response.json({ data: [
+    { id: 'doubao-seedream-5-0-260128', object: 'model' },
+    { id: 'doubao-seedream-4-5-251128', object: 'model' },
+    { id: 'doubao-seedream-4-0-250828', object: 'model' },
+    { id: 'jimeng-5.0', object: 'model' },
+    { id: 'SeedVR2-Upscaler', object: 'model' },
+  ] }));
+  const models = await adapter.listModels!({ apiKey: 'sk-test', serviceType: 'image' });
+  const ratios = ['1:1', '4:3', '3:4', '16:9', '9:16', '3:2', '2:3', '21:9'];
+  for (const id of [
+    'doubao-seedream-5-0-260128',
+    'doubao-seedream-4-5-251128',
+    'doubao-seedream-4-0-250828',
+    'jimeng-5.0',
+  ]) {
+    assert.deepEqual(models.find((model) => model.id === id)?.capabilities, {
+      modes: ['text-to-image', 'image-to-image'],
+      maxReferenceImages: 10,
+      aspectRatios: ratios,
+      billingMode: 'unknown',
+      supportsDuration: false,
+      supportedDurations: null,
+      source: 'adapter-override',
+    });
+  }
+  assert.deepEqual(models.find((model) => model.id === 'SeedVR2-Upscaler')?.capabilities, {
+    modes: ['image-to-image'],
+    maxReferenceImages: 1,
+    aspectRatios: null,
+    billingMode: 'unknown',
+    supportsDuration: false,
+    supportedDurations: null,
+    source: 'adapter-override',
+  });
+});
+
 test('PearAPI 只使用 Bearer /v1/models，并为已核验 GPT Image 2 模型补充能力', async () => {
   const requests: Array<{ url: string; method: string; authorization?: string }> = [];
   const adapter = createPearApiAdapter(async (input, init) => {

@@ -807,3 +807,15 @@
 - 参考图只注入奶龙卡与后室卡；生成链路与入口/`README`/`history` 同步改名。
 - 真实生成：资产标准图用横版 `4:3`（奶龙用布局 D + 正/侧视图与平淡、狂笑表情分格）；分镜底板用 `1:1`；不用竖版 9:16。
 - 分镜在 `nano-banana-pro-4k` / `gpt-image-2` 上过慢；owner 改令用 Agnes（`agnes-image-2.5-flash`）续跑分镜 1:1；三资产 Nano Banana 结果保留。
+
+## 2026-09-28：提示词组装去掉产品接线说明
+
+- Owner：组装出的提示词必须等于发给模型的文本，过程透明；不要把「参考图如何提交」等产品接线写进 prompt。
+- 资产锁点与分镜锁点删除「一并发给模型 / 配方参考图列表」类句子；保留锚点与一致性约束。`spec` / 测同步。
+
+## 2026-09-28：PearAPI Doubao Seedream 适配与奶龙实测
+
+- Owner：按桌面专栏 `Doubao（豆包 Seedream）.txt` 补独立合同与适配器；用最好豆包模型重跑奶龙后室。
+- 新增 `10-image-Doubao（豆包 Seedream）.md`；`provider-api-contract` / `provider-integration` / 通用合同索引同步。
+- `pearApi.ts`：`doubao-seedream-*` 与 `jimeng-4.0/4.5/5.0` 补洞为 10 张参考图 + 8 种画幅；`SeedVR2-Upscaler` 单独 1 张、画幅未知。`dynamicModels` 测覆盖。
+- 优选 `doubao-seedream-5-0-260128` 跑三资产 4:3 + 分镜 1:1（`run:nailong-doubao`）。

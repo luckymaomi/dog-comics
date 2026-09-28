@@ -50,15 +50,15 @@ test('未选图片参考锁定时不组装锁定段', () => {
   assert.match(prompt, /产出布局 C/u);
 });
 
-test('选中锁脸后显式写入上传参考图数量与全部提交说明', () => {
+test('选中锁脸后显式写入上传参考图数量与锁脸约束', () => {
   const prompt = assembleAssetOutputPrompt(
     asset('character-layout-b', 'face', null, ['/static/uploads/a.png', '/static/uploads/b.png']),
   );
   assert.match(
     prompt,
-    /^图片参考锁定（锁脸）：基于我上传的输入参考图（共 2 张）为唯一面部身份锚点，img2img 图生图。/u,
+    /^图片参考锁定（锁脸）：基于我上传的输入参考图（共 2 张）为唯一面部身份锚点，img2img 图生图。严格保持/u,
   );
-  assert.match(prompt, /将把本卡「输入参考图」列表中的全部图片一并发给模型/u);
+  assert.equal(/一并发给模型|不另选单张|输入参考图」列表/u.test(prompt), false);
   assert.match(prompt, /发际线与发型轮廓一致/u);
   assert.match(prompt, /左脸右身/u);
 });

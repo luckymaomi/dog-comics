@@ -71,7 +71,7 @@ export function normalizeBanImageText(value: unknown): ImageTextBanKind | null {
   throw new ValidationError("画面禁字选项无效");
 }
 
-/** 选中锁定时显式写明：基于我上传的输入参考图（共 N 张）为锚点；多张则全部作为锚点一并提交。 */
+/** 选中锁定时显式写明：基于我上传的输入参考图（共 N 张）为锚点。组装结果即发给模型的文本，不含产品接线说明。 */
 export function buildReferenceLockBlock(
   lock: ReferenceLockKind,
   inputReferenceImages: readonly string[] | undefined,
@@ -83,15 +83,13 @@ export function buildReferenceLockBlock(
     count > 0
       ? `基于我上传的输入参考图（共 ${count} 张）`
       : "基于我上传的输入参考图（共 0 张；当前卡尚无输入参考图，生成前请先上传）";
-  const submitNote =
-    "生成时将把本卡「输入参考图」列表中的全部图片一并发给模型，不另选单张。";
   if (lock === "face") {
-    return `图片参考锁定（锁脸）：${anchorCount}为唯一面部身份锚点，img2img 图生图。${submitNote}严格保持参考图中人物的同一张脸：脸型、额头、颧骨、下颌、眉形、眼型、鼻型、唇形、发际线与发型轮廓一致。`;
+    return `图片参考锁定（锁脸）：${anchorCount}为唯一面部身份锚点，img2img 图生图。严格保持参考图中人物的同一张脸：脸型、额头、颧骨、下颌、眉形、眼型、鼻型、唇形、发际线与发型轮廓一致。`;
   }
   if (lock === "scene") {
-    return `图片参考锁定（锁景）：${anchorCount}为唯一场景锚点，img2img 图生图。${submitNote}严格保持参考图中的空间结构、建筑风格、尺度关系、关键陈设相对位置与色调一致。`;
+    return `图片参考锁定（锁景）：${anchorCount}为唯一场景锚点，img2img 图生图。严格保持参考图中的空间结构、建筑风格、尺度关系、关键陈设相对位置与色调一致。`;
   }
-  return `图片参考锁定（锁物）：${anchorCount}为唯一道具锚点，img2img 图生图。${submitNote}严格保持参考图中道具的外形轮廓、比例、材质、颜色与特殊标记一致。`;
+  return `图片参考锁定（锁物）：${anchorCount}为唯一道具锚点，img2img 图生图。严格保持参考图中道具的外形轮廓、比例、材质、颜色与特殊标记一致。`;
 }
 
 export function assembleAssetOutputPrompt(

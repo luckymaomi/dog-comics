@@ -56,7 +56,7 @@ function normalizePearModel(value: unknown): ProviderModel | undefined {
 
 function inferModelKind(id: string): 'image' | 'video' | undefined {
   if (/grok.*video|veo|sora|video|seedance|ltx/iu.test(id)) return 'video';
-  if (/flux|image|seedream|nano.?banana|sdxl|stable.?diffusion/iu.test(id)) return 'image';
+  if (/flux|image|seedream|nano.?banana|sdxl|stable.?diffusion|doubao|jimeng|seedvr/iu.test(id)) return 'image';
   return undefined;
 }
 
@@ -83,6 +83,17 @@ function knownModelMetadata(id: string, item: JsonRecord): PearModelMetadata {
       ? ['9:16', '16:9', '1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '21:9']
       : ['9:16', '16:9', '1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '21:9', '1:4', '4:1', '1:8', '8:1'],
   };
+  if (isDoubaoSeedreamFamilyId(lower)) return {
+    ...metadata,
+    supported_modes: ['text2image', 'image2image'],
+    reference_image: 10,
+    aspect_ratio: ['1:1', '4:3', '3:4', '16:9', '9:16', '3:2', '2:3', '21:9'],
+  };
+  if (isSeedVr2UpscalerId(lower)) return {
+    ...metadata,
+    supported_modes: ['image2image'],
+    reference_image: 1,
+  };
   if (isGrokImagineImageId(lower)) return {
     ...metadata,
     supported_modes: ['text2image', 'image2image'],
@@ -101,6 +112,8 @@ function isKnownModelOverride(id: string): boolean {
   return isGptImage2FamilyId(lower)
     || lower === 'gpt-image-1.5'
     || isNanoBananaFamilyId(lower)
+    || isDoubaoSeedreamFamilyId(lower)
+    || isSeedVr2UpscalerId(lower)
     || isGrokImagineImageId(lower)
     || /^grok-imagine-video-1\.5(?:-preview)?$/iu.test(lower);
 }
@@ -113,6 +126,17 @@ function isGptImage2FamilyId(lower: string): boolean {
 /** nano-banana 基础 / pro / 2 及目录清晰度档 -1k/-2k/-4k、lite */
 function isNanoBananaFamilyId(lower: string): boolean {
   return /^nano-banana(?:-pro(?:-(?:1k|2k|4k))?|-2(?:-(?:1k|2k|4k|lite))?)?$/iu.test(lower);
+}
+
+/** doubao-seedream-*，及官方兼容旧别名 jimeng-4.0 / 4.5 / 5.0 */
+function isDoubaoSeedreamFamilyId(lower: string): boolean {
+  return /^doubao-seedream-/iu.test(lower)
+    || /^jimeng-(?:4\.0|4\.5|5\.0)$/iu.test(lower);
+}
+
+/** SeedVR2 超分：参考图上限 1，画幅未知不猜 */
+function isSeedVr2UpscalerId(lower: string): boolean {
+  return lower === 'seedvr2-upscaler';
 }
 
 /** grok-imagine-image 及目录正式变体 -2、-2-2k；兼容旧别名 grok-3/4-image */

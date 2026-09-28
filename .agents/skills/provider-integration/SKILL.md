@@ -5,7 +5,7 @@ description: 修改 potato 的 Agnes/PearAPI 适配器、模型目录、超时�
 
 # Provider Integration
 
-涉及外部媒体字段、模型能力数字、PearAPI/Agnes 请求路径或协议文档时，先读取仓库内的 [provider-api-contract](../provider-api-contract/SKILL.md)。PearAPI 生图见其 `references/00-general-contract.md` 与三个 `10-image-*.md`；Agnes 生图见 `references/20-agnes-image.md`。
+涉及外部媒体字段、模型能力数字、PearAPI/Agnes 请求路径或协议文档时，先读取仓库内的 [provider-api-contract](../provider-api-contract/SKILL.md)。PearAPI 生图见其 `references/00-general-contract.md` 与四个 `10-image-*.md`（含 Doubao Seedream）；Agnes 生图见 `references/20-agnes-image.md`。
 
 生图 URL 拿到之后的 `remote` → 本地归档 → 指针切换，读 [media-archive](../media-archive/SKILL.md)；适配器到 URL 即止。
 

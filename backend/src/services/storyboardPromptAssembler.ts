@@ -48,7 +48,7 @@ export function assemblePanelRecipe({
   return { panelRecipe: { prompt: imagePrompt, references: [...references] } };
 }
 
-/** 按出场资产类型写入锁脸/锁景/锁物；锚点显式指向该卡当前标准图（不是资产输入参考图）。 */
+/** 按出场资产类型写入锁脸/锁景/锁物；锚点显式指向该卡当前标准图。组装结果即发给模型的文本，不含产品接线说明。 */
 export function buildPanelAssetLockBlock(
   asset: Pick<ProjectAssetRow, "kind" | "name" | "image_url">,
 ): string {
@@ -58,15 +58,13 @@ export function buildPanelAssetLockBlock(
   const anchor = hasStandard
     ? `基于出场${label}卡「${name}」的当前标准图为唯一`
     : `基于出场${label}卡「${name}」的当前标准图为唯一（当前卡尚无标准图，生成前请先产出标准图）`;
-  const submitNote =
-    "生成时将该标准图作为参考图发给模型（配方参考图列表中的对应项）。";
   if (asset.kind === "character") {
-    return `图片参考锁定（锁脸）：${anchor}面部身份锚点，img2img 图生图。${submitNote}严格保持参考图中人物的同一张脸：脸型、额头、颧骨、下颌、眉形、眼型、鼻型、唇形、发际线与发型轮廓一致。`;
+    return `图片参考锁定（锁脸）：${anchor}面部身份锚点，img2img 图生图。严格保持参考图中人物的同一张脸：脸型、额头、颧骨、下颌、眉形、眼型、鼻型、唇形、发际线与发型轮廓一致。`;
   }
   if (asset.kind === "scene") {
-    return `图片参考锁定（锁景）：${anchor}场景锚点，img2img 图生图。${submitNote}严格保持参考图中的空间结构、建筑风格、尺度关系、关键陈设相对位置与色调一致。`;
+    return `图片参考锁定（锁景）：${anchor}场景锚点，img2img 图生图。严格保持参考图中的空间结构、建筑风格、尺度关系、关键陈设相对位置与色调一致。`;
   }
-  return `图片参考锁定（锁物）：${anchor}道具锚点，img2img 图生图。${submitNote}严格保持参考图中道具的外形轮廓、比例、材质、颜色与特殊标记一致。`;
+  return `图片参考锁定（锁物）：${anchor}道具锚点，img2img 图生图。严格保持参考图中道具的外形轮廓、比例、材质、颜色与特殊标记一致。`;
 }
 
 /** 资产台组装提示词用的卡面文本块；分镜组装不再注入此段。 */

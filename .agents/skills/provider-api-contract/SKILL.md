@@ -1,6 +1,6 @@
 ---
 name: provider-api-contract
-description: "维护并验证 potato 的 PearAPI/Agnes 生图 Provider API 协议、模型能力目录与适配器映射；修改 GPT Image、Nano Banana、Grok、Agnes 生图请求或能力补洞时使用。"
+description: "维护并验证 potato 的 PearAPI/Agnes 生图 Provider API 协议、模型能力目录与适配器映射；修改 GPT Image、Nano Banana、Grok、Doubao Seedream、Agnes 生图请求或能力补洞时使用。"
 ---
 
 # Provider API 协议合同（生图）
@@ -16,6 +16,7 @@ description: "维护并验证 potato 的 PearAPI/Agnes 生图 Provider API 协�
    - GPT Image → `references/10-image-GPT Image.md`
    - Nano Banana（Gemini Image） → `references/10-image-Nano Banana（Gemini Image）.md`
    - Grok（xAI）生图 → `references/10-image-Grok（xAI）.md`
+   - Doubao（豆包 Seedream） → `references/10-image-Doubao（豆包 Seedream）.md`
    - Agnes 生图 → `references/20-agnes-image.md`（官方 wiki：`agnes-image-2.5/2.1/2.0-flash`）
 2. 外部桌面源文件删除后不作为运行时依赖；以本目录合同为准。Agnes 以 wiki.agnes-ai.com / agnes-ai.com 已拉取页面为证据；PearAPI 以本目录 `10-image-*.md` 为准。标准化文档不能替代仍可取得的源证据。
 3. 能力三层：供应商目录原始字段 → 适配器已核验补洞（`source: adapter-override`）→ 业务通用校验。未知保持 `null`/`unknown`，禁止从示例或其它专栏猜测。目录正式 id 以供应商返回为准；静态专栏滞后时按同族能力补洞，不得把目录 id 当成脏数据丢掉。
@@ -32,6 +33,7 @@ description: "维护并验证 potato 的 PearAPI/Agnes 生图 Provider API 协�
 | GPT Image 模型表与补洞状态 | `references/10-image-GPT Image.md` |
 | Nano Banana 模型表与补洞状态 | `references/10-image-Nano Banana（Gemini Image）.md` |
 | Grok 生图模型表与缺口 | `references/10-image-Grok（xAI）.md` |
+| Doubao Seedream 模型表与补洞状态 | `references/10-image-Doubao（豆包 Seedream）.md` |
 | Agnes 生图（2.5/2.1/2.0） | `references/20-agnes-image.md`（证据：wiki.agnes-ai.com） |
 
 ## 变更与验收

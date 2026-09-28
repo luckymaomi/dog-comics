@@ -11,6 +11,7 @@
     "init:nailong-backrooms-demo": "tsx scripts/initializeNailongBackroomsDemo.ts",
     "accept:nailong-backrooms-demo": "tsx scripts/initializeNailongBackroomsDemo.ts",
     "run:nailong-backrooms": "tsx scripts/runNailongBackroomsWorkflow.ts",
+    "run:nailong-doubao": "tsx scripts/runNailongDoubaoWorkflow.ts",
     "continue:nailong-panel-gpt2": "tsx scripts/continuePanelGptImage2Nailong.ts",
     "continue:nailong-panel-agnes": "tsx scripts/continuePanelAgnesNailong.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",

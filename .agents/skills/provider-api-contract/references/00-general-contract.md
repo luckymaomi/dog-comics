@@ -1,7 +1,7 @@
 # PearAPI 生图 · 通用合同
 
 本 Skill 的 `references/` **只维护 PearAPI 生图**。官方专栏源文件在桌面
-`生图生视频API/PearAPI/图片/`（GPT Image、Nano Banana（Gemini Image）、Grok（xAI））。
+`生图生视频API/PearAPI/图片/`（GPT Image、Nano Banana（Gemini Image）、Grok（xAI）、Doubao（豆包 Seedream））。
 源文件不是运行时依赖；本目录合同才是仓库内可审查事实。
 
 生视频合同不在本 Skill 的 `references/` 中维护。视频能力若仍存在于适配器代码，以代码与单独视频任务为准，不得从本目录图片专栏推导。
@@ -79,5 +79,6 @@
 | GPT Image | `10-image-GPT Image.md` |
 | Nano Banana（Gemini Image） | `10-image-Nano Banana（Gemini Image）.md` |
 | Grok（xAI） | `10-image-Grok（xAI）.md` |
+| Doubao（豆包 Seedream） | `10-image-Doubao（豆包 Seedream）.md` |
 
 维护时：官方文档更新 → 先改对应专栏合同 → 再改 `pearApi.ts` 的 `knownModelMetadata` / `isKnownModelOverride` → 再补 `backend/test/dynamicModels.test.ts`。
