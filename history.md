@@ -762,5 +762,29 @@
 
 - Owner：归档推送后做整体调试：删死代码/错误逻辑，再二次推送。
 - 删除 `confirm-review` 路由、facade 与前端 API；去掉已无调用的 `assembleStoryboardRecipes`。
-- `markPanelImageChanged` 恢复单参；资产标准图/文本变更经 `markAssetImageChanged` 置 `recipe_needs_reassembly`（有配方或底板的引用分镜）。`image_needs_review` 列仍保留兼容，产品面不再使用。
+- `markPanelImageChanged` 恢复单参；资产标准图/文本变更经 `markAssetImageChanged` 置 `recipe_needs_reassembly`（有配方或底板的引用分镜）。
 - 回归：新增仓储测；后端 77 测与 typecheck 通过。
+
+## 2026-09-26：删除 image_needs_review 并同步归档/Agnes 合同
+
+- Owner：无兼容壳；按 AGENTS 断裂纪律直接删掉无用待复核列与类型字段。
+- `panels.image_needs_review` 从 schema 移除，初始化时对旧库 `DROP COLUMN`；前后端类型与 hydrate 同步删除。
+- `media-archive` / `provider-integration` / `provider-api-contract`（含新建 `20-agnes-image.md`、通用合同成功判定）对齐 remote→归档边界：适配器止于 URL，业务层负责远程预览与本地指针。
+- `spec` 去掉待复核残留表述。
+
+## 2026-09-26：按 Agnes 官网 wiki 重写生图合同
+
+- Owner：不要凭空写 Agnes；从官网文档核对后再更新合同。
+- 已拉取并对照：`agnes-image-2.5-flash` / `2.1-flash` / `2.0-flash` 与 overview（Base、Bearer、`POST /v1/images/generations`）。
+- `20-agnes-image.md` 按官方参数表重写：`size` 档位 + `ratio`、`extra_body.response_format`（禁顶层）、`extra_body.image`、同步响应 `data[0].url`；并与现有 `agnes.ts` / 单测契约对齐。适配器实现未改（此前已按文档正确）。
+
+## 2026-09-26：真实 Agnes 全流程跑通并写运行报告
+
+- Owner：启动全流程，限流则重试到全部生成；根目录写报告说明主链与提示词组装。
+- 空库初始化《女王出浴》Demo；`agnes-image-2.5-flash` 串行生成 3 资产标准图 + 1 分镜底板；四次均一次完成并本地归档（约 110s，无外层 429 重试）。
+- 证据：`workflow-run-evidence.json`；报告：`漫画工作流运行报告.md`。
+
+## 2026-09-26：改用 PearAPI GPT Image 2 重跑并重写报告
+
+- Owner：关服务；女王注入 `C:\Users\Administrator\Desktop\AI短剧\性感.png`；左脸右身布局；GPT Image 2；报告写全文提示词与正确绝对路径。
+- 三资产一次成功；分镜原 action 不合规，软化后 generation 6 完成。报告已覆盖组装全文与 uploads/projects 绝对路径；`workflow-run.log` 已删。

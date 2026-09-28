@@ -1,0 +1,212 @@
+{
+  "startedAt": "2026-09-26T15:30:11.945Z",
+  "finishedAt": "2026-09-26T15:30:11.945Z",
+  "provider": "pearapi",
+  "model": "gpt-image-2",
+  "projectId": 1,
+  "repoRoot": "C:\\Users\\Administrator\\Desktop\\repository\\potato",
+  "storageRoot": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage",
+  "queenReference": {
+    "ownerSourceAbsolute": "C:\\Users\\Administrator\\Desktop\\AI短剧\\性感.png",
+    "injectedAs": [
+      {
+        "publicUrl": "/static/uploads/4ae4162a-2cd0-4317-85e4-8becafb4cb5e.png",
+        "absoluteUnderRepo": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\uploads\\4ae4162a-2cd0-4317-85e4-8becafb4cb5e.png",
+        "ownerSourceAbsolute": "C:\\Users\\Administrator\\Desktop\\AI短剧\\性感.png"
+      }
+    ],
+    "note": "owner 源文件复制到 backend/data/storage/uploads 后以 /static/uploads/... 写入女王卡 input_reference_images；生图时 MediaReferenceService 转 inline 交给 PearAPI。"
+  },
+  "assetAssembleDemo": [
+    {
+      "assetId": 1,
+      "kind": "character",
+      "name": "女王",
+      "outputType": "character-layout-b",
+      "briefFull": "成年女性；精致鹅蛋脸，下颌柔和，红唇微启，眉眼妩媚，睫毛带水汽；黑色长发浴后微湿贴肩；高挑匀称沙漏型体态，暖白肤色带蒸汽晕红与水光；写实真人五官与发丝，禁止二次元；象牙白薄浴巾松绕：上沿压在锁骨下方盖住胸部，下摆垂到大腿中段，肩颈与上背外露，一侧肩头巾角欲滑未滑；不戴王冠，赤足；回眸浅笑、微微眯眼、红唇轻启，妩媚自信",
+      "inputReferenceImages": [
+        "/static/uploads/4ae4162a-2cd0-4317-85e4-8becafb4cb5e.png"
+      ],
+      "savedOutputPromptFull": "图片参考锁定（锁脸）：以我上传的参考图为唯一面部身份锚点，img2img 图生图。严格保持参考图中人物的同一张脸：脸型、额头、颧骨、下颌、眉形、眼型、鼻型、唇形、发际线与发型轮廓一致。\n画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n角色卡「女王」：视觉描述：成年女性；精致鹅蛋脸，下颌柔和，红唇微启，眉眼妩媚，睫毛带水汽；黑色长发浴后微湿贴肩；高挑匀称沙漏型体态，暖白肤色带蒸汽晕红与水光；写实真人五官与发丝，禁止二次元；象牙白薄浴巾松绕：上沿压在锁骨下方盖住胸部，下摆垂到大腿中段，肩颈与上背外露，一侧肩头巾角欲滑未滑；不戴王冠，赤足；回眸浅笑、微微眯眼、红唇轻启，妩媚自信\n产出布局 B（左脸右身）：左侧为正脸特写，包含头部与肩部并锁定五官与发型；右侧为正面、90度侧面、背面三张等高全身视图，头顶与脚底对齐。",
+      "rebuiltAssemblePreviewFull": "图片参考锁定（锁脸）：以我上传的参考图为唯一面部身份锚点，img2img 图生图。严格保持参考图中人物的同一张脸：脸型、额头、颧骨、下颌、眉形、眼型、鼻型、唇形、发际线与发型轮廓一致。\n画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n角色卡「女王」：视觉描述：成年女性；精致鹅蛋脸，下颌柔和，红唇微启，眉眼妩媚，睫毛带水汽；黑色长发浴后微湿贴肩；高挑匀称沙漏型体态，暖白肤色带蒸汽晕红与水光；写实真人五官与发丝，禁止二次元；象牙白薄浴巾松绕：上沿压在锁骨下方盖住胸部，下摆垂到大腿中段，肩颈与上背外露，一侧肩头巾角欲滑未滑；不戴王冠，赤足；回眸浅笑、微微眯眼、红唇轻启，妩媚自信\n产出布局 B（左脸右身）：左侧为正脸特写，包含头部与肩部并锁定五官与发型；右侧为正面、90度侧面、背面三张等高全身视图，头顶与脚底对齐。",
+      "image_url": "/static/projects/1/images/1.png",
+      "local_path": "projects/1/images/1.png",
+      "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\1.png",
+      "generationId": 1
+    },
+    {
+      "assetId": 2,
+      "kind": "scene",
+      "name": "浴室",
+      "outputType": "scene-panorama",
+      "briefFull": "王室私人浴室；中央大理石浴池，古典王室浴殿石柱与金线嵌边，台阶、石制盥洗台、毛巾架，私密中型空间；室内金色壁灯与柔光，蒸汽散射体积光，暖琥珀色温；私密安静奢华，象牙白、暖金、雾灰与水光，室内高湿蒸汽，写实材质",
+      "inputReferenceImages": [],
+      "savedOutputPromptFull": "画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n场景卡「浴室」：视觉描述：王室私人浴室；中央大理石浴池，古典王室浴殿石柱与金线嵌边，台阶、石制盥洗台、毛巾架，私密中型空间；室内金色壁灯与柔光，蒸汽散射体积光，暖琥珀色温；私密安静奢华，象牙白、暖金、雾灰与水光，室内高湿蒸汽，写实材质\n产出空间全景图：使用宽幅构图，清楚呈现整体布局、空间关系、建筑风格、尺度和氛围，保持透视结构可供后续分镜复用。",
+      "rebuiltAssemblePreviewFull": "画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n场景卡「浴室」：视觉描述：王室私人浴室；中央大理石浴池，古典王室浴殿石柱与金线嵌边，台阶、石制盥洗台、毛巾架，私密中型空间；室内金色壁灯与柔光，蒸汽散射体积光，暖琥珀色温；私密安静奢华，象牙白、暖金、雾灰与水光，室内高湿蒸汽，写实材质\n产出空间全景图：使用宽幅构图，清楚呈现整体布局、空间关系、建筑风格、尺度和氛围，保持透视结构可供后续分镜复用。",
+      "image_url": "/static/projects/1/images/2.png",
+      "local_path": "projects/1/images/2.png",
+      "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\2.png",
+      "generationId": 2
+    },
+    {
+      "assetId": 3,
+      "kind": "prop",
+      "name": "备用巾",
+      "outputType": "prop-multi-angle",
+      "briefFull": "浴室织物；成人用大浴巾；厚实棉质真实织纹；象牙白近纯白；长方形折叠整齐；干净干燥备用，一角细小金色纹章，宽幅褶皱自然；叠放在石台上作背景陈设，人物身上另有裹巾；写实布料",
+      "inputReferenceImages": [],
+      "savedOutputPromptFull": "画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n道具卡「备用巾」：视觉描述：浴室织物；成人用大浴巾；厚实棉质真实织纹；象牙白近纯白；长方形折叠整齐；干净干燥备用，一角细小金色纹章，宽幅褶皱自然；叠放在石台上作背景陈设，人物身上另有裹巾；写实布料\n产出多角度图：同一道具包含正面、侧面和局部特写，清楚呈现尺寸、材质、颜色、形状、特殊标记与默认状态。",
+      "rebuiltAssemblePreviewFull": "画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n道具卡「备用巾」：视觉描述：浴室织物；成人用大浴巾；厚实棉质真实织纹；象牙白近纯白；长方形折叠整齐；干净干燥备用，一角细小金色纹章，宽幅褶皱自然；叠放在石台上作背景陈设，人物身上另有裹巾；写实布料\n产出多角度图：同一道具包含正面、侧面和局部特写，清楚呈现尺寸、材质、颜色、形状、特殊标记与默认状态。",
+      "image_url": "/static/projects/1/images/3.png",
+      "local_path": "projects/1/images/3.png",
+      "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\3.png",
+      "generationId": 3
+    }
+  ],
+  "panelAssembleDemo": {
+    "panelId": 1,
+    "title": "分镜1｜女王出浴",
+    "originalActionNote": "Demo 原 action 偏敏感，PearAPI GPT Image 2 返回「生成内容不合规」；本续跑改用软化后的 action（全文见 actionFullSoftened）后再组装。",
+    "actionFullSoftened": "写实真人摄影：王室私人浴室暖雾中，成年女性女王立于大理石浴池边回眸，身披象牙白浴巾（上沿约锁骨下、下摆约至大腿中段），湿发贴肩，水光未干；半身至膝上构图，女王居中偏右，蒸汽虚化背景，远处石台可见叠好的备用巾；暖琥珀壁灯勾轮廓；电影感写实质感，无文字、无水印。",
+    "assembledPromptFull": "写实真人摄影：王室私人浴室暖雾中，成年女性女王立于大理石浴池边回眸，身披象牙白浴巾（上沿约锁骨下、下摆约至大腿中段），湿发贴肩，水光未干；半身至膝上构图，女王居中偏右，蒸汽虚化背景，远处石台可见叠好的备用巾；暖琥珀壁灯勾轮廓；电影感写实质感，无文字、无水印。\n干净画面；无字幕、无气泡、无水印",
+    "assembledReferences": [
+      "/static/projects/1/images/1.png",
+      "/static/projects/1/images/2.png",
+      "/static/projects/1/images/3.png"
+    ],
+    "assetStandardUrls": [
+      {
+        "id": 1,
+        "name": "女王",
+        "image_url": "/static/projects/1/images/1.png",
+        "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\1.png"
+      },
+      {
+        "id": 2,
+        "name": "浴室",
+        "image_url": "/static/projects/1/images/2.png",
+        "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\2.png"
+      },
+      {
+        "id": 3,
+        "name": "备用巾",
+        "image_url": "/static/projects/1/images/3.png",
+        "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\3.png"
+      }
+    ]
+  },
+  "generations": [
+    {
+      "label": "asset:女王",
+      "generationId": 1,
+      "taskId": "d80c7504-11d8-4ce4-afd2-3b29c1216604",
+      "generationStatus": "completed",
+      "imageUrl": "/static/projects/1/images/1.png",
+      "localPath": "projects/1/images/1.png",
+      "available": true,
+      "promptFull": "图片参考锁定（锁脸）：以我上传的参考图为唯一面部身份锚点，img2img 图生图。严格保持参考图中人物的同一张脸：脸型、额头、颧骨、下颌、眉形、眼型、鼻型、唇形、发际线与发型轮廓一致。\n画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n角色卡「女王」：视觉描述：成年女性；精致鹅蛋脸，下颌柔和，红唇微启，眉眼妩媚，睫毛带水汽；黑色长发浴后微湿贴肩；高挑匀称沙漏型体态，暖白肤色带蒸汽晕红与水光；写实真人五官与发丝，禁止二次元；象牙白薄浴巾松绕：上沿压在锁骨下方盖住胸部，下摆垂到大腿中段，肩颈与上背外露，一侧肩头巾角欲滑未滑；不戴王冠，赤足；回眸浅笑、微微眯眼、红唇轻启，妩媚自信\n产出布局 B（左脸右身）：左侧为正脸特写，包含头部与肩部并锁定五官与发型；右侧为正面、90度侧面、背面三张等高全身视图，头顶与脚底对齐。",
+      "referenceImages": [
+        "/static/uploads/4ae4162a-2cd0-4317-85e4-8becafb4cb5e.png"
+      ],
+      "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\1.png",
+      "fromPreviousRun": true
+    },
+    {
+      "label": "asset:浴室",
+      "generationId": 2,
+      "taskId": "5affcf33-6518-4bb0-8191-b1214218a756",
+      "generationStatus": "completed",
+      "imageUrl": "/static/projects/1/images/2.png",
+      "localPath": "projects/1/images/2.png",
+      "available": true,
+      "promptFull": "画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n场景卡「浴室」：视觉描述：王室私人浴室；中央大理石浴池，古典王室浴殿石柱与金线嵌边，台阶、石制盥洗台、毛巾架，私密中型空间；室内金色壁灯与柔光，蒸汽散射体积光，暖琥珀色温；私密安静奢华，象牙白、暖金、雾灰与水光，室内高湿蒸汽，写实材质\n产出空间全景图：使用宽幅构图，清楚呈现整体布局、空间关系、建筑风格、尺度和氛围，保持透视结构可供后续分镜复用。",
+      "referenceImages": [],
+      "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\2.png",
+      "fromPreviousRun": true
+    },
+    {
+      "label": "asset:备用巾",
+      "generationId": 3,
+      "taskId": "b67c5fb7-183c-4a54-8f4a-8889dab5cecd",
+      "generationStatus": "completed",
+      "imageUrl": "/static/projects/1/images/3.png",
+      "localPath": "projects/1/images/3.png",
+      "available": true,
+      "promptFull": "画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n道具卡「备用巾」：视觉描述：浴室织物；成人用大浴巾；厚实棉质真实织纹；象牙白近纯白；长方形折叠整齐；干净干燥备用，一角细小金色纹章，宽幅褶皱自然；叠放在石台上作背景陈设，人物身上另有裹巾；写实布料\n产出多角度图：同一道具包含正面、侧面和局部特写，清楚呈现尺寸、材质、颜色、形状、特殊标记与默认状态。",
+      "referenceImages": [],
+      "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\3.png",
+      "fromPreviousRun": true
+    },
+    {
+      "label": "panel:分镜1｜女王出浴",
+      "attempt": 1,
+      "generationId": 6,
+      "taskId": "5e094455-0100-4435-9c59-401858dd3fb5",
+      "taskStatus": "completed",
+      "taskError": null,
+      "generationStatus": "completed",
+      "imageUrl": "/static/projects/1/images/6.png",
+      "localPath": "projects/1/images/6.png",
+      "available": true,
+      "promptFull": "写实真人摄影：王室私人浴室暖雾中，成年女性女王立于大理石浴池边回眸，身披象牙白浴巾（上沿约锁骨下、下摆约至大腿中段），湿发贴肩，水光未干；半身至膝上构图，女王居中偏右，蒸汽虚化背景，远处石台可见叠好的备用巾；暖琥珀壁灯勾轮廓；电影感写实质感，无文字、无水印。\n干净画面；无字幕、无气泡、无水印",
+      "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\6.png"
+    }
+  ],
+  "summary": {
+    "assets": [
+      {
+        "id": 1,
+        "kind": "character",
+        "name": "女王",
+        "output_type": "character-layout-b",
+        "output_prompt_full": "图片参考锁定（锁脸）：以我上传的参考图为唯一面部身份锚点，img2img 图生图。严格保持参考图中人物的同一张脸：脸型、额头、颧骨、下颌、眉形、眼型、鼻型、唇形、发际线与发型轮廓一致。\n画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n角色卡「女王」：视觉描述：成年女性；精致鹅蛋脸，下颌柔和，红唇微启，眉眼妩媚，睫毛带水汽；黑色长发浴后微湿贴肩；高挑匀称沙漏型体态，暖白肤色带蒸汽晕红与水光；写实真人五官与发丝，禁止二次元；象牙白薄浴巾松绕：上沿压在锁骨下方盖住胸部，下摆垂到大腿中段，肩颈与上背外露，一侧肩头巾角欲滑未滑；不戴王冠，赤足；回眸浅笑、微微眯眼、红唇轻启，妩媚自信\n产出布局 B（左脸右身）：左侧为正脸特写，包含头部与肩部并锁定五官与发型；右侧为正面、90度侧面、背面三张等高全身视图，头顶与脚底对齐。",
+        "input_reference_images": [
+          "/static/uploads/4ae4162a-2cd0-4317-85e4-8becafb4cb5e.png"
+        ],
+        "image_url": "/static/projects/1/images/1.png",
+        "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\1.png",
+        "generationId": 1
+      },
+      {
+        "id": 2,
+        "kind": "scene",
+        "name": "浴室",
+        "output_type": "scene-panorama",
+        "output_prompt_full": "画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n场景卡「浴室」：视觉描述：王室私人浴室；中央大理石浴池，古典王室浴殿石柱与金线嵌边，台阶、石制盥洗台、毛巾架，私密中型空间；室内金色壁灯与柔光，蒸汽散射体积光，暖琥珀色温；私密安静奢华，象牙白、暖金、雾灰与水光，室内高湿蒸汽，写实材质\n产出空间全景图：使用宽幅构图，清楚呈现整体布局、空间关系、建筑风格、尺度和氛围，保持透视结构可供后续分镜复用。",
+        "input_reference_images": [],
+        "image_url": "/static/projects/1/images/2.png",
+        "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\2.png",
+        "generationId": 2
+      },
+      {
+        "id": 3,
+        "kind": "prop",
+        "name": "备用巾",
+        "output_type": "prop-multi-angle",
+        "output_prompt_full": "画面约束（禁止出字）：图像中不得出现任何文字、字母、数字、字幕、水印、招牌字、标签、气泡或其它可读字符；保持纯视觉画面。\n道具卡「备用巾」：视觉描述：浴室织物；成人用大浴巾；厚实棉质真实织纹；象牙白近纯白；长方形折叠整齐；干净干燥备用，一角细小金色纹章，宽幅褶皱自然；叠放在石台上作背景陈设，人物身上另有裹巾；写实布料\n产出多角度图：同一道具包含正面、侧面和局部特写，清楚呈现尺寸、材质、颜色、形状、特殊标记与默认状态。",
+        "input_reference_images": [],
+        "image_url": "/static/projects/1/images/3.png",
+        "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\3.png",
+        "generationId": 3
+      }
+    ],
+    "panels": [
+      {
+        "id": 1,
+        "title": "分镜1｜女王出浴",
+        "action_full": "写实真人摄影：王室私人浴室暖雾中，成年女性女王立于大理石浴池边回眸，身披象牙白浴巾（上沿约锁骨下、下摆约至大腿中段），湿发贴肩，水光未干；半身至膝上构图，女王居中偏右，蒸汽虚化背景，远处石台可见叠好的备用巾；暖琥珀壁灯勾轮廓；电影感写实质感，无文字、无水印。",
+        "image_recipe_prompt_full": "写实真人摄影：王室私人浴室暖雾中，成年女性女王立于大理石浴池边回眸，身披象牙白浴巾（上沿约锁骨下、下摆约至大腿中段），湿发贴肩，水光未干；半身至膝上构图，女王居中偏右，蒸汽虚化背景，远处石台可见叠好的备用巾；暖琥珀壁灯勾轮廓；电影感写实质感，无文字、无水印。\n干净画面；无字幕、无气泡、无水印",
+        "image_recipe_references": [
+          "/static/projects/1/images/1.png",
+          "/static/projects/1/images/2.png",
+          "/static/projects/1/images/3.png"
+        ],
+        "image_url": "/static/projects/1/images/6.png",
+        "absoluteLocalPath": "C:\\Users\\Administrator\\Desktop\\repository\\potato\\backend\\data\\storage\\projects\\1\\images\\6.png",
+        "generationId": 6
+      }
+    ],
+    "allAssetsReady": true,
+    "allPanelsReady": true
+  }
+}

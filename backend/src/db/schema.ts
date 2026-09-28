@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS project_assets (
 CREATE TABLE IF NOT EXISTS panels (
   id INTEGER PRIMARY KEY AUTOINCREMENT, episode_id INTEGER NOT NULL REFERENCES episodes(id) ON DELETE CASCADE, panel_number INTEGER NOT NULL,
   title TEXT, description TEXT, action TEXT,
-  image_prompt TEXT, image_recipe_prompt TEXT NOT NULL DEFAULT '', image_recipe_references TEXT NOT NULL DEFAULT '[]', extra_reference_images TEXT NOT NULL DEFAULT '[]', image_needs_review INTEGER NOT NULL DEFAULT 0, recipe_needs_reassembly INTEGER NOT NULL DEFAULT 0,
+  image_prompt TEXT, image_recipe_prompt TEXT NOT NULL DEFAULT '', image_recipe_references TEXT NOT NULL DEFAULT '[]', extra_reference_images TEXT NOT NULL DEFAULT '[]', recipe_needs_reassembly INTEGER NOT NULL DEFAULT 0,
   image_url TEXT, current_image_generation_id INTEGER, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(episode_id, panel_number)
 );
 CREATE TABLE IF NOT EXISTS panel_project_assets (panel_id INTEGER NOT NULL REFERENCES panels(id) ON DELETE CASCADE, project_asset_id INTEGER NOT NULL REFERENCES project_assets(id) ON DELETE CASCADE, PRIMARY KEY(panel_id, project_asset_id));
@@ -40,6 +40,7 @@ export function initializeDatabase(database: SQLiteDatabase): void {
   database.pragma('foreign_keys = ON');
   database.exec(SCHEMA);
   ensureColumn(database, 'image_generations', 'archive_attempts', 'INTEGER NOT NULL DEFAULT 0');
+  dropColumnIfExists(database, 'panels', 'image_needs_review');
 }
 
 function ensureColumn(
@@ -48,9 +49,22 @@ function ensureColumn(
   column: string,
   definition: string,
 ): void {
-  const columns = database.prepare(`PRAGMA table_info(${table})`).all() as Array<{
-    name: string;
-  }>;
-  if (columns.some((item) => item.name === column)) return;
+  const columns = tableColumns(database, table);
+  if (columns.includes(column)) return;
   database.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+}
+
+function dropColumnIfExists(
+  database: SQLiteDatabase,
+  table: string,
+  column: string,
+): void {
+  if (!tableColumns(database, table).includes(column)) return;
+  database.exec(`ALTER TABLE ${table} DROP COLUMN ${column}`);
+}
+
+function tableColumns(database: SQLiteDatabase, table: string): string[] {
+  return (
+    database.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>
+  ).map((item) => item.name);
 }

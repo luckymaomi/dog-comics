@@ -566,7 +566,6 @@ test('全新 schema 支持项目资产卡和分镜额外参考图', () => {
     assert.equal(panelColumns.some((column) => column.name === 'extra_reference_images'), true);
     assert.equal(panelColumns.some((column) => column.name === 'image_recipe_prompt'), true);
     assert.equal(panelColumns.some((column) => column.name === 'image_recipe_references'), true);
-    assert.equal(panelColumns.some((column) => column.name === 'image_needs_review'), true);
     assert.equal(panelColumns.some((column) => column.name === 'recipe_needs_reassembly'), true);
     assert.equal(imageColumns.some((column) => column.name === 'project_asset_id'), true);
   } finally { db.close(); }

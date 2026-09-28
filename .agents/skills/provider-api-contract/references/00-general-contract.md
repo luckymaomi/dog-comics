@@ -66,7 +66,7 @@
 - 固定 `task_type=async`（不跟官方默认 sync）
 - 参考图：本地静态路径先经 `MediaReferenceService` 转 inline data URL；单张用 `image`，多张用 `images`
 - 画幅：业务传入的 `aspectRatio` 映射到请求的 `aspect_ratio`（必要时同时带 `size`）
-- 成功判定：供应商返回可下载 URL → 本地下载归档 → generation 落库；HTTP 200 / 仅 task id **不等于**业务完成
+- 成功判定：供应商返回可下载 URL 后，业务先 `remote` 挂远程预览，再有界本地归档为 `completed`（见 media-archive）；HTTP 200 / 仅 task id / 仅远程 URL **不等于**本地归档完成
 
 ### 错误
 

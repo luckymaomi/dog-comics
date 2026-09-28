@@ -267,12 +267,10 @@ export interface RawPanel
     | "project_asset_ids"
     | "extra_reference_images"
     | "image_recipe_references"
-    | "image_needs_review"
     | "recipe_needs_reassembly"
   > {
   extra_reference_images: string;
   image_recipe_references: string;
-  image_needs_review: number;
   recipe_needs_reassembly: number;
 }
 
@@ -285,7 +283,6 @@ export function hydratePanelRow(db: SQLiteDatabase, row: RawPanel): PanelRow {
       row.image_recipe_references,
       [],
     ),
-    image_needs_review: Boolean(row.image_needs_review),
     recipe_needs_reassembly: Boolean(row.recipe_needs_reassembly),
   };
 }

@@ -42,7 +42,6 @@ export interface Panel {
   image_recipe_references: string[];
   image_url?: string | null;
   current_image_generation_id?: number | null;
-  image_needs_review?: boolean;
   recipe_needs_reassembly?: boolean;
   project_asset_ids?: number[];
   extra_reference_images?: string[];

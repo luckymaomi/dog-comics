@@ -1,11 +1,13 @@
 ---
 name: provider-integration
-description: 修改 potato 的 Agnes/PearAPI 适配器、模型目录、超时、限流重试、任务轮询或供应商进度时使用；不负责画布交互。
+description: 修改 potato 的 Agnes/PearAPI 适配器、模型目录、超时、限流重试、任务轮询或供应商进度时使用；不负责画布交互与本地归档指针。
 ---
 
 # Provider Integration
 
-涉及外部媒体字段、模型能力数字、PearAPI/Agnes 请求路径或协议文档时，先读取仓库内的 [provider-api-contract](../provider-api-contract/SKILL.md)；PearAPI 生图标准化证据见其 `references/00-general-contract.md` 与三个 `10-image-*.md` 专栏。
+涉及外部媒体字段、模型能力数字、PearAPI/Agnes 请求路径或协议文档时，先读取仓库内的 [provider-api-contract](../provider-api-contract/SKILL.md)。PearAPI 生图见其 `references/00-general-contract.md` 与三个 `10-image-*.md`；Agnes 生图见 `references/20-agnes-image.md`。
+
+生图 URL 拿到之后的 `remote` → 本地归档 → 指针切换，读 [media-archive](../media-archive/SKILL.md)；适配器到 URL 即止。
 
 ## 分层
 
@@ -23,4 +25,4 @@ description: 修改 potato 的 Agnes/PearAPI 适配器、模型目录、超时�
 ## 验证边界
 
 - 确定性测试覆盖映射、能力拒绝、超时、重试和取消。
-- 真实外部验收必须有 owner 授权和凭据证据；Mock、HTTP 200 或任务已提交不能证明媒体生成成功。
+- 真实外部验收必须有 owner 授权和凭据证据；Mock、HTTP 200 或任务已提交不能证明媒体生成成功，也不能代替 media-archive 的本地归档验收。
