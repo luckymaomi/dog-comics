@@ -208,6 +208,7 @@ export function AssetWorkspace() {
         output_type: values.output_type,
         reference_lock: values.reference_lock ?? null,
         ban_image_text: values.ban_image_text ?? null,
+        input_reference_images: values.input_reference_images ?? [],
       })
       const draft = drafts.current.get(assetId) ?? values
       draft.output_type = result.output_type

@@ -1,6 +1,5 @@
 /**
- * PearAPI GPT Image 2 全流程：女王注入本地参考图 + 左脸右身布局组装 → 生标准图 → 分镜底板。
- * 遇限流外层重试至全部完成；写出证据 JSON。
+ * PearAPI gpt-image-2：《奶龙后室》注入桌面参考图 → 组装 → 生标准图(4:3) → 分镜底板(1:1)。
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -17,7 +16,17 @@ import { initializeNailongBackroomsDemo } from "./nailongBackroomsDemoRuntime";
 
 const ROOT = path.resolve(__dirname, "../..");
 const EVIDENCE_PATH = path.join(ROOT, "workflow-run-evidence.json");
-const QUEEN_REF_SOURCE = String.raw`C:\Users\Administrator\Desktop\AI短剧\性感.png`;
+const REF_DIR = String.raw`C:\Users\Administrator\Desktop\参考图`;
+const NAILONG_REFS = [
+  path.join(REF_DIR, "奶龙参考1.png"),
+  path.join(REF_DIR, "奶龙参考2-converted.png"),
+];
+const BACKROOMS_REFS = [
+  path.join(REF_DIR, "后室参考1-converted.png"),
+  path.join(REF_DIR, "后室参考2.jpg"),
+];
+const MODEL_ID = "gpt-image-2";
+const ASSET_MODEL_FALLBACK = ["gpt-image-2"];
 const MAX_OUTER_ATTEMPTS = 40;
 const POLL_MS = 2000;
 
@@ -27,7 +36,7 @@ type Evidence = {
   projectId?: number;
   provider?: string;
   model?: string;
-  queenReference?: Record<string, string>;
+  stagedReferences?: unknown[];
   assetAssembleDemo: unknown[];
   panelAssembleDemo?: unknown;
   generations: Array<Record<string, unknown>>;
@@ -156,26 +165,23 @@ async function generateUntilDone(
   throw new Error(`${label}: 超过外层重试上限仍未完成`);
 }
 
-function stageQueenReference(storageRoot: string): {
-  sourceAbsolute: string;
-  stagedAbsolute: string;
-  publicUrl: string;
-  relativePath: string;
-} {
-  if (!fs.existsSync(QUEEN_REF_SOURCE)) {
-    throw new Error(`参考图不存在：${QUEEN_REF_SOURCE}`);
+function stageReference(
+  storageRoot: string,
+  sourceAbsolute: string,
+): { sourceAbsolute: string; stagedAbsolute: string; publicUrl: string } {
+  if (!fs.existsSync(sourceAbsolute)) {
+    throw new Error(`参考图不存在：${sourceAbsolute}`);
   }
   const uploadsDir = path.join(storageRoot, "uploads");
   fs.mkdirSync(uploadsDir, { recursive: true });
-  const filename = `${randomUUID()}.png`;
+  const ext = path.extname(sourceAbsolute).toLowerCase() || ".png";
+  const filename = `${randomUUID()}${ext}`;
   const stagedAbsolute = path.join(uploadsDir, filename);
-  fs.copyFileSync(QUEEN_REF_SOURCE, stagedAbsolute);
-  const relativePath = path.posix.join("uploads", filename);
+  fs.copyFileSync(sourceAbsolute, stagedAbsolute);
   return {
-    sourceAbsolute: QUEEN_REF_SOURCE,
+    sourceAbsolute,
     stagedAbsolute,
-    publicUrl: `/static/${relativePath}`,
-    relativePath,
+    publicUrl: `/static/uploads/${filename}`,
   };
 }
 
@@ -199,12 +205,12 @@ async function main(): Promise<void> {
     await services.aiConfigs.refresh("pearapi", "image");
     const models = services.aiConfigs.models("pearapi", "image");
     const preferred =
+      models.find((m) => m.id.toLowerCase() === MODEL_ID) ||
       models.find((m) => /^gpt-image-2$/iu.test(m.id)) ||
-      models.find((m) => /^gpt-image-2(?:-|$)/iu.test(m.id)) ||
       models.find((m) => /gpt-image-2/iu.test(m.id));
     if (!preferred) {
       throw new Error(
-        `PearAPI 目录无 gpt-image-2；当前图片模型：${models.map((m) => m.id).join(", ") || "(空)"}`,
+        `PearAPI 目录无 ${MODEL_ID}；当前图片模型：${models.map((m) => m.id).join(", ") || "(空)"}`,
       );
     }
     services.aiConfigs.savePresets({
@@ -218,56 +224,99 @@ async function main(): Promise<void> {
     const project = initializeNailongBackroomsDemo(db, services, logger);
     evidence.projectId = project.id;
 
-    const ref = stageQueenReference(storageRoot);
-    evidence.queenReference = {
-      ownerSourceAbsolute: ref.sourceAbsolute,
-      stagedAbsolute: ref.stagedAbsolute,
-      publicUrl: ref.publicUrl,
-      relativeUnderStorage: ref.relativePath,
-      note: "owner 源文件复制进 backend/data/storage/uploads，再写入女王卡 input_reference_images",
-    };
-    console.log(`女王参考图已暂存：${ref.publicUrl} ← ${ref.sourceAbsolute}`);
+    const stagedNailong = NAILONG_REFS.map((src) => stageReference(storageRoot, src));
+    const stagedBackrooms = BACKROOMS_REFS.map((src) => stageReference(storageRoot, src));
+    evidence.stagedReferences = [
+      ...stagedNailong.map((item) => ({ role: "character:奶龙", ...item })),
+      ...stagedBackrooms.map((item) => ({ role: "scene:后室", ...item })),
+    ];
+    console.log(
+      `参考图已暂存：奶龙 ${stagedNailong.length} 张，后室 ${stagedBackrooms.length} 张`,
+    );
 
-    // 女王：左脸右身 + 锁脸 + 禁字，注入参考图；场景/道具：重新组装中文模板（保留 brief）
     const assetsBefore = services.assets.listProjectAssets(project.id);
+    const landscapeSheetNote =
+      "画幅要求：整张输出为横版 4:3 参考表（landscape），禁止竖版 9:16 / 9:21。";
     for (const asset of assetsBefore) {
-      if (asset.kind === "character" && asset.name === "女王") {
-        const outputType = "character-layout-b" as const;
-        const assembled = assembleAssetOutputPrompt({
-          kind: asset.kind,
-          name: asset.name,
-          text_profile: asset.text_profile,
-          output_type: outputType,
-          reference_lock: "face",
-          ban_image_text: "ban",
-        });
+      if (asset.kind === "character" && asset.name === "奶龙") {
+        const outputType = "character-layout-d" as const;
+        const inputRefs = stagedNailong.map((item) => item.publicUrl);
+        const assembled = [
+          assembleAssetOutputPrompt({
+            kind: asset.kind,
+            name: asset.name,
+            text_profile: asset.text_profile,
+            output_type: outputType,
+            reference_lock: "face",
+            ban_image_text: "ban",
+            input_reference_images: inputRefs,
+          }),
+          landscapeSheetNote,
+          "横版分格补充：同一张 4:3 图内至少包含正面全身、90度侧面全身、平淡/中性表情头像、恶搞狂笑捧腹表情头像（眯眼大张嘴露牙）；各格同一角色身份与配色一致。",
+        ].join("\n");
         const updated = services.assets.updateProjectAsset(asset.id, {
           name: asset.name,
           text_profile: asset.text_profile,
           output_type: outputType,
           output_prompt: assembled,
-          input_reference_images: [ref.publicUrl],
+          input_reference_images: inputRefs,
         });
         evidence.assetAssembleDemo.push({
           assetId: updated.id,
           kind: updated.kind,
           name: updated.name,
           outputType: updated.output_type,
-          brief: updated.text_profile.brief,
+          aspectRatio: "4:3",
           referenceLock: "face",
           banImageText: "ban",
           inputReferenceImages: updated.input_reference_images,
           assembledOutputPromptFull: assembled,
-          savedOutputPromptFull: updated.output_prompt,
         });
-      } else {
-        const assembled = assembleAssetOutputPrompt({
-          kind: asset.kind,
+      } else if (asset.kind === "scene" && asset.name === "后室") {
+        const inputRefs = stagedBackrooms.map((item) => item.publicUrl);
+        const assembled = [
+          assembleAssetOutputPrompt({
+            kind: asset.kind,
+            name: asset.name,
+            text_profile: asset.text_profile,
+            output_type: asset.output_type,
+            reference_lock: "scene",
+            ban_image_text: "ban",
+            input_reference_images: inputRefs,
+          }),
+          landscapeSheetNote,
+        ].join("\n");
+        const updated = services.assets.updateProjectAsset(asset.id, {
           name: asset.name,
           text_profile: asset.text_profile,
           output_type: asset.output_type,
-          ban_image_text: "ban",
+          output_prompt: assembled,
+          input_reference_images: inputRefs,
         });
+        evidence.assetAssembleDemo.push({
+          assetId: updated.id,
+          kind: updated.kind,
+          name: updated.name,
+          outputType: updated.output_type,
+          aspectRatio: "4:3",
+          referenceLock: "scene",
+          banImageText: "ban",
+          inputReferenceImages: updated.input_reference_images,
+          assembledOutputPromptFull: assembled,
+        });
+      } else {
+        const assembled = [
+          assembleAssetOutputPrompt({
+            kind: asset.kind,
+            name: asset.name,
+            text_profile: asset.text_profile,
+            output_type: asset.output_type,
+            reference_lock: "prop",
+            ban_image_text: "ban",
+          }),
+          landscapeSheetNote,
+          "横版多角度：同一张 4:3 图内给出正面、侧面与局部特写。",
+        ].join("\n");
         const updated = services.assets.updateProjectAsset(asset.id, {
           name: asset.name,
           text_profile: asset.text_profile,
@@ -280,12 +329,11 @@ async function main(): Promise<void> {
           kind: updated.kind,
           name: updated.name,
           outputType: updated.output_type,
-          brief: updated.text_profile.brief,
-          referenceLock: null,
+          aspectRatio: "4:3",
+          referenceLock: "prop",
           banImageText: "ban",
           inputReferenceImages: [],
           assembledOutputPromptFull: assembled,
-          savedOutputPromptFull: updated.output_prompt,
         });
       }
     }
@@ -298,124 +346,76 @@ async function main(): Promise<void> {
     for (const asset of assets) {
       await generateUntilDone(
         `asset:${asset.name}`,
-        () => {
-          const current = services.assets.getProjectAsset(asset.id)!;
-          return services.images.create({
+        () =>
+          services.images.create({
             dramaId: project.id,
             projectAssetId: asset.id,
-            prompt: current.output_prompt,
             provider: "pearapi",
             model: preferred.id,
-            aspectRatio: "9:16",
-            referenceImages: current.input_reference_images,
-          });
-        },
-        (id) => services.tasks.get(id),
-        (id) => services.images.get(id),
+            prompt: asset.output_prompt,
+            aspectRatio: "4:3",
+            referenceImages: asset.input_reference_images,
+          }),
+        (taskId) => services.tasks.get(taskId),
+        (id) => services.images.get(id) ?? undefined,
         evidence,
       );
     }
 
+    const freshAssets = services.assets.listProjectAssets(project.id);
     for (const panel of panels) {
-      const freshAssets = services.assets.listProjectAssets(project.id);
       const recipe = assemblePanelRecipe({ shot: panel, assets: freshAssets });
       evidence.panelAssembleDemo = {
         panelId: panel.id,
         title: panel.title,
-        actionFull: panel.action,
-        projectAssetIds: panel.project_asset_ids,
+        aspectRatio: "1:1",
         assembledPromptFull: recipe.panelRecipe.prompt,
         assembledReferences: recipe.panelRecipe.references,
-        assetStandardUrls: freshAssets
-          .filter((a) => panel.project_asset_ids.includes(a.id))
-          .map((a) => ({
-            id: a.id,
-            name: a.name,
-            image_url: a.image_url,
-            absoluteLocalPath: a.local_path
-              ? path.join(ROOT, "backend", "data", "storage", a.local_path)
-              : null,
-          })),
       };
-      services.assets.updatePanel(panel.id, {
+      const latest = services.assets.updatePanel(panel.id, {
+        action: panel.action,
         image_recipe_prompt: recipe.panelRecipe.prompt,
         image_recipe_references: recipe.panelRecipe.references,
-        recipe_reassembled: true,
+        project_asset_ids: panel.project_asset_ids,
+        extra_reference_images: panel.extra_reference_images,
+        recipe_needs_reassembly: false,
       });
-
       await generateUntilDone(
-        `panel:${panel.title || panel.id}`,
-        () => {
-          const latest = services.assets.getPanel(panel.id)!;
-          return services.images.create({
+        `panel:${latest.title}`,
+        () =>
+          services.images.create({
             dramaId: project.id,
-            panelId: panel.id,
-            prompt: latest.image_recipe_prompt,
+            panelId: latest.id,
             provider: "pearapi",
             model: preferred.id,
+            prompt: latest.image_recipe_prompt,
             aspectRatio: "1:1",
             referenceImages: latest.image_recipe_references,
-          });
-        },
-        (id) => services.tasks.get(id),
-        (id) => services.images.get(id),
+          }),
+        (taskId) => services.tasks.get(taskId),
+        (id) => services.images.get(id) ?? undefined,
         evidence,
       );
     }
 
-    const finalAssets = services.assets.listProjectAssets(project.id);
-    const finalPanels = services.assets.listPanels(episode.id);
+    evidence.finishedAt = new Date().toISOString();
     evidence.summary = {
-      repoRoot: ROOT,
-      storageRoot,
-      assets: finalAssets.map((a) => ({
+      assets: freshAssets.map((a) => ({
         id: a.id,
-        kind: a.kind,
         name: a.name,
-        output_type: a.output_type,
-        output_prompt_full: a.output_prompt,
-        input_reference_images: a.input_reference_images,
-        hasImage: Boolean(a.image_url),
         image_url: a.image_url,
         local_path: a.local_path,
-        absoluteLocalPath: a.local_path
-          ? path.join(storageRoot, ...a.local_path.split("/"))
-          : null,
-        generationId: a.current_image_generation_id,
       })),
-      panels: finalPanels.map((p) => ({
+      panels: services.assets.listPanels(episode.id).map((p) => ({
         id: p.id,
         title: p.title,
-        action_full: p.action,
+        image_url: p.image_url,
         image_recipe_prompt_full: p.image_recipe_prompt,
         image_recipe_references: p.image_recipe_references,
-        hasImage: Boolean(p.image_url),
-        image_url: p.image_url,
-        absoluteLocalPath: p.image_url?.startsWith("/static/")
-          ? path.join(storageRoot, p.image_url.replace(/^\/static\//u, ""))
-          : null,
-        generationId: p.current_image_generation_id,
       })),
-      allAssetsReady: finalAssets.every((a) => Boolean(a.image_url)),
-      allPanelsReady: finalPanels.every((p) => Boolean(p.image_url)),
     };
-    evidence.finishedAt = new Date().toISOString();
     fs.writeFileSync(EVIDENCE_PATH, JSON.stringify(evidence, null, 2), "utf8");
-    console.log(`证据已写：${EVIDENCE_PATH}`);
-    console.log(
-      JSON.stringify(
-        {
-          allAssetsReady: evidence.summary.allAssetsReady,
-          allPanelsReady: evidence.summary.allPanelsReady,
-          model: evidence.model,
-        },
-        null,
-        2,
-      ),
-    );
-    if (!evidence.summary.allAssetsReady || !evidence.summary.allPanelsReady) {
-      process.exitCode = 1;
-    }
+    console.log(`证据已写入 ${EVIDENCE_PATH}`);
   } finally {
     closeDb();
   }

@@ -92,6 +92,7 @@ export const workspaceApi = {
       output_type?: AssetOutputType;
       reference_lock?: ReferenceLockKind | null;
       ban_image_text?: ImageTextBanKind | null;
+      input_reference_images?: string[];
     },
   ) =>
     apiClient.post<

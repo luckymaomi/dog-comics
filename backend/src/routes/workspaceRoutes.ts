@@ -133,6 +133,7 @@ function registerAssetRoutes(
       name: text(body.name) || "未命名资产",
       text_profile: normalizeTextProfile(kind, body.text_profile),
       output_type: outputType,
+      input_reference_images: normalizeStringArray(body.input_reference_images),
       reference_lock: referenceLock,
       ban_image_text: banImageText,
     });

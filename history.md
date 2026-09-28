@@ -788,3 +788,22 @@
 
 - Owner：关服务；女王注入 `C:\Users\Administrator\Desktop\AI短剧\性感.png`；左脸右身布局；GPT Image 2；报告写全文提示词与正确绝对路径。
 - 三资产一次成功；分镜原 action 不合规，软化后 generation 6 完成。报告已覆盖组装全文与 uploads/projects 绝对路径；`workflow-run.log` 已删。
+
+## 2026-09-28：资产锁定组装显式写出上传参考图数量
+
+- Owner：锁脸/锁景/锁物文案再显式，把「基于我上传的参考图为锚点」写进组装结果。
+- 选中锁定时写入「基于我上传的输入参考图（共 N 张）为唯一…锚点」，并说明生成会把本卡输入参考图全部提交；组装请求携带当前 `input_reference_images`。测与 `spec` 同步。
+
+## 2026-09-28：分镜配方按出场资产 kind 注入锁点段
+
+- Owner：分镜引用角色/场景/道具时，组装应显式加上对应锁脸/锁景/锁物，并挂上引用的标准图。
+- `storyboardPromptAssembler`：本镜画面 → 按 `project_asset_ids` 顺序写锁点（锚点为「出场×卡『名』的当前标准图」；缺标准图仍写锁点并注明）→ 干净画面约束。不抄 `text_profile` / `output_prompt`；参考图仍为标准图 + 其他参考图。
+- `spec` / `README` / 组装单测 / `coreServices` 消费测同步。
+
+## 2026-09-28：Demo 从《女王出浴》换成《奶龙后室》
+
+- Owner：空库；桌面 `参考图` 定稿为奶龙 2 张 + 经典后室 Level 0 共 2 张；删掉女王示例；用 PearAPI `nano-banana-pro-4k` 生成后给人审。
+- Demo 定义/运行时/初始化脚本文件重命名为 `nailongBackrooms*`；资产为角色「奶龙」、场景「后室」、道具「笑影实体」（自创黄影怪）；contract `v13-nailong-backrooms`。
+- 参考图只注入奶龙卡与后室卡；生成链路与入口/`README`/`history` 同步改名。
+- 真实生成：资产标准图用横版 `4:3`（奶龙用布局 D + 正/侧视图与平淡、狂笑表情分格）；分镜底板用 `1:1`；不用竖版 9:16。
+- 分镜在 `nano-banana-pro-4k` / `gpt-image-2` 上过慢；owner 改令用 Agnes（`agnes-image-2.5-flash`）续跑分镜 1:1；三资产 Nano Banana 结果保留。

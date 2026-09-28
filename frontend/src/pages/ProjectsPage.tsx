@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { projectsApi } from '../api/projects'
 import { userErrorMessage } from '../errors/appError'
-import { openRainyNightDemo } from '../features/workspace/demoProject'
+import { openNailongBackroomsDemo } from '../features/workspace/demoProject'
 import type { Episode, Project } from '../types/domain'
 
 interface ProjectFormValues {
@@ -120,7 +120,7 @@ export function ProjectsPage() {
   const openDemo = async () => {
     setCreatingDemo(true)
     try {
-      const id = await openRainyNightDemo()
+      const id = await openNailongBackroomsDemo()
       navigate(`/comic/${id}/script`)
     } catch (error) {
       message.error(userErrorMessage(error))

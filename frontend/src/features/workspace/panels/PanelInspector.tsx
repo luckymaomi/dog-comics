@@ -213,7 +213,7 @@ function PanelSpecFields() {
       >
         <Input.TextArea
           autoSize={{ minRows: 4, maxRows: 12 }}
-          placeholder="例：王室浴室蒸汽中，女王刚离浴池回眸而立，半身至膝上，暖琥珀灯光，私密奢华"
+          placeholder="例：经典后室黄墙走廊中，奶龙捧腹狂笑，尽头隐约有笑影实体"
         />
       </Form.Item>
     </>

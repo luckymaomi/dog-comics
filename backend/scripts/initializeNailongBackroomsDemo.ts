@@ -4,7 +4,7 @@ import { initializeDatabase } from '../src/db/schema';
 import logger, { configureAuditLog } from '../src/logger';
 import { providerRegistry } from '../src/providers';
 import { createServices } from '../src/services/container';
-import { initializeQueenAccessionDemo } from './queenAccessionDemoRuntime';
+import { initializeNailongBackroomsDemo } from './nailongBackroomsDemoRuntime';
 
 async function main(): Promise<void> {
   const config = loadConfig();
@@ -13,9 +13,9 @@ async function main(): Promise<void> {
   try {
     initializeDatabase(db);
     const services = createServices(db, config, providerRegistry, logger);
-    const project = initializeQueenAccessionDemo(db, services, logger);
-    console.log(`《女王登基》Demo 已初始化：项目 ID ${project.id}`);
-    console.log('故事总览、项目资产和两条完整分镜规格已写入；未调用供应商或生成媒体。');
+    const project = initializeNailongBackroomsDemo(db, services, logger);
+    console.log(`《奶龙后室》Demo 已初始化：项目 ID ${project.id}`);
+    console.log('故事总览、项目资产和分镜规格已写入；未调用供应商或生成媒体。');
   } finally {
     closeDb();
   }

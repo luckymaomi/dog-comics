@@ -336,7 +336,9 @@ test('分镜显式组装图片配方，图片生成消费用户保存的图片�
     });
     assert.equal(assembled.status, 200);
     const recipes = (await assembled.json() as { data: { image_recipe_prompt: string; image_recipe_references: string[] } }).data;
-    assert.equal(recipes.image_recipe_prompt, '王冠静物近景\n干净画面；无字幕、无气泡、无水印');
+    assert.match(recipes.image_recipe_prompt, /^王冠静物近景\n/);
+    assert.match(recipes.image_recipe_prompt, /图片参考锁定（锁物）：基于出场道具卡「王冠」的当前标准图为唯一道具锚点/);
+    assert.match(recipes.image_recipe_prompt, /干净画面；无字幕、无气泡、无水印$/);
     assert.deepEqual(recipes.image_recipe_references, [TEST_PNG, 'https://cdn.test/light.png']);
 
     const finalPrompt = '用户确认并改写的王冠静物图片配方';
