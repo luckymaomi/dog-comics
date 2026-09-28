@@ -42,35 +42,25 @@ test('半成品 Demo 会原位补齐为结构化漫画工作区且重复初始�
     const repaired = initializeNailongBackroomsDemo(db, services, logger);
     assert.equal(repaired.id, half.id);
     assert.equal(nailongBackroomsDemoComplete(repaired), true);
-    assert.equal(repaired.title, '《奶龙后室》制作示例');
-    assert.equal(repaired.story_hook.includes('后室'), true);
-    assert.equal(repaired.worldview.includes('后室'), true);
-    assert.equal(repaired.reference_setting.includes('奶龙'), true);
+    assert.equal(repaired.title, '奶龙');
     assert.equal(services.projects.list({ page: 1, pageSize: 20 }).total, 1);
-    assert.equal(repaired.metadata.demo_provider, undefined);
-    assert.equal(repaired.project_assets?.length, 3);
-    assert.equal(repaired.episodes?.[0]?.panels?.length, 1);
-    assert.equal(repaired.episodes?.[0]?.panels?.every((shot) => shot.project_asset_ids.length === 3), true);
+    assert.equal(repaired.project_assets?.length, 1);
+    assert.equal(repaired.episodes?.[0]?.panels?.length, 0);
     assert.deepEqual(
-      repaired.project_assets?.map((asset) => `${asset.kind}:${asset.name}`).sort(),
-      ['character:奶龙', 'prop:笑影实体', 'scene:后室'],
+      new Set(repaired.project_assets?.map((asset) => `${asset.kind}:${asset.name}`)),
+      new Set([
+        'character:角色卡-奶龙-06',
+      ]),
     );
-    const characterKeys = ['brief'];
-    const sceneKeys = ['brief'];
-    const propKeys = ['brief'];
+    const byName = new Map((repaired.project_assets ?? []).map((asset) => [asset.name, asset]));
+    assert.equal(byName.get('角色卡-奶龙-06')?.output_type, 'character-layout-f');
     for (const asset of repaired.project_assets ?? []) {
-      const expected = asset.kind === 'character' ? characterKeys : asset.kind === 'scene' ? sceneKeys : propKeys;
-      assert.deepEqual(Object.keys(asset.text_profile).sort(), [...expected].sort());
-      assert.equal(expected.every((key) => Boolean(asset.text_profile[key]?.trim())), true);
-      assert.equal(Boolean(asset.output_prompt?.trim()), true);
+      assert.equal(asset.kind, 'character');
+      assert.deepEqual(asset.text_profile, {});
+      assert.equal(asset.output_prompt, '');
+      assert.deepEqual(asset.input_reference_images, []);
     }
-    assert.equal(repaired.project_assets?.find((asset) => asset.kind === 'character')?.output_type, 'character-layout-a');
-    assert.equal(repaired.project_assets?.find((asset) => asset.kind === 'scene')?.output_type, 'scene-panorama');
-    assert.equal(repaired.project_assets?.find((asset) => asset.kind === 'prop')?.output_type, 'prop-multi-angle');
-    assert.equal(repaired.episodes?.[0]?.panels?.every((shot) => Boolean(shot.action && shot.image_prompt)), true);
-    assert.equal(repaired.episodes?.[0]?.duration, 6);
-    assert.equal(repaired.episodes?.[0]?.title, '第 1 话｜奶龙后室');
-    assert.equal(repaired.episodes?.[0]?.episode_goal.includes('奶龙'), true);
+    assert.equal(repaired.episodes?.[0]?.title, '第 1 话');
 
     const repeated = initializeNailongBackroomsDemo(db, services, logger);
     assert.equal(repeated.id, half.id);

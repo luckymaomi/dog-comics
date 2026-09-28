@@ -46,11 +46,23 @@ export interface ProviderConfiguration {
   endpoints?: Partial<Record<ProviderKind, ProviderEndpointConfiguration>>;
 }
 
+/** PearAPI 公开价目（/system/auth/models/all）合并到目录后的计费投影；缺价时为 undefined。 */
+export interface ProviderModelPricing {
+  /** 单次/单价，人民币数值；供应商未给时为 null */
+  price: number | null;
+  currency: 'CNY';
+  /** 原始 billing_type，如 count / duration */
+  billingType: string | null;
+  /** 供应商中文摘要，如「按次 ¥0.14」 */
+  summary: string | null;
+}
+
 export interface ProviderModel {
   id: string;
   label: string;
   kind: ProviderKind;
   capabilities: ProviderModelCapabilities;
+  pricing?: ProviderModelPricing;
 }
 
 export interface ProviderModelDiscoveryInput {

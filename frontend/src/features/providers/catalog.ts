@@ -57,7 +57,16 @@ export function modelCapabilityLabels(model: ProviderModel): string[] {
     else labels.push('时长能力未知')
     if (model.capabilities.supportedDurations?.length) labels.push(`时长 ${model.capabilities.supportedDurations.join('、')} 秒`)
   }
+  const pricingLabel = modelPricingLabel(model)
+  if (pricingLabel) labels.push(pricingLabel)
   return labels
+}
+
+export function modelPricingLabel(model: ProviderModel): string | undefined {
+  const summary = model.pricing?.summary?.trim()
+  if (summary) return summary
+  if (model.pricing?.price === null || model.pricing?.price === undefined) return undefined
+  return `¥${model.pricing.price}`
 }
 
 export function modelSupportsDuration(model: ProviderModel | undefined): boolean {
@@ -100,6 +109,7 @@ export function aspectRatiosFor(models: ProviderModel[], current?: string): stri
 
 export function preferredAspectRatio(aspectRatios: string[], current?: string): string | undefined {
   if (current && aspectRatios.includes(current)) return current
+  if (aspectRatios.includes('4:3')) return '4:3'
   return aspectRatios[0]
 }
 

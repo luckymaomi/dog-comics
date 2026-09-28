@@ -15,15 +15,24 @@ import { mediaUrl } from '../../utils/mediaUrl'
 import { useAnnounceGenerationOutcomes } from '../generation/useAnnounceGenerationOutcomes'
 import { assetImageKey, useGenerationTracker } from '../generation/useGenerationTracker'
 import { useProjectWorkspace } from './workspaceContext'
-import { assetLabels, parseKindFilter, profileSummary, type AssetFilter, type AssetFormValues } from './assetWorkspaceConfig'
+import {
+  assetLabels,
+  DEFAULT_BAN_IMAGE_TEXT,
+  defaultReferenceLock,
+  parseKindFilter,
+  profileSummary,
+  type AssetFilter,
+  type AssetFormValues,
+} from './assetWorkspaceConfig'
 import { AssetDetailPanel, AssetStatusBadge } from './AssetDetailPanel'
 import type { AssetGenerationState } from './assetGenerationStatus'
-import { modelAspectRatioOptions } from '../providers/catalog'
+import { modelAspectRatioOptions, preferredAspectRatio } from '../providers/catalog'
 import { useDebouncedAutoSave } from './useDebouncedAutoSave'
+import { ModelSummary } from './panels/PanelInspector'
 
 export function AssetWorkspace() {
   const { message, modal } = App.useApp()
-  const { project, episode } = useProjectWorkspace()
+  const { project, episode, setHeaderTools } = useProjectWorkspace()
   const [searchParams, setSearchParams] = useSearchParams()
   const [allAssets, setAllAssets] = useState<ProjectAsset[]>([])
   const [history, setHistory] = useState<MediaGenerationHistory[]>([])
@@ -114,25 +123,57 @@ export function AssetWorkspace() {
       })
     return () => { active = false }
   }, [])
+
+  useEffect(() => {
+    setHeaderTools(
+      <ModelSummary
+        model={imageModel}
+        label={imageModelLabel}
+        title="资产图片模型"
+      />,
+    )
+    return () => setHeaderTools(null)
+  }, [imageModel, imageModelLabel, setHeaderTools])
+
   useEffect(() => {
     if (formAssetId.current === selected?.id) return
     formAssetId.current = selected?.id
     form.resetFields()
-    if (selected) form.setFieldsValue(drafts.current.get(selected.id) ?? {
-      name: selected.name,
-      text_profile: selected.text_profile,
-      output_type: selected.output_type,
-      reference_lock: null,
-      ban_image_text: null,
-      output_prompt: selected.output_prompt,
-      input_reference_images: selected.input_reference_images,
-       aspect_ratio: undefined,
-    })
+    if (selected) {
+      const draft = drafts.current.get(selected.id)
+      const ratios = imageModel ? modelAspectRatioOptions(imageModel) : []
+      form.setFieldsValue(draft ?? {
+        name: selected.name,
+        text_profile: selected.text_profile,
+        output_type: selected.output_type,
+        reference_lock: defaultReferenceLock(selected.kind),
+        ban_image_text: DEFAULT_BAN_IMAGE_TEXT,
+        output_prompt: selected.output_prompt,
+        input_reference_images: selected.input_reference_images,
+        aspect_ratio: preferredAspectRatio(ratios),
+      })
+    }
   }, [form, imageModel, selected])
 
   useEffect(() => {
     if (!selected || !imageModel) return
-    // 画幅必须由用户显式选择，不根据目录首项自动填充。
+    const current = form.getFieldValue('aspect_ratio') as string | undefined
+    const ratios = modelAspectRatioOptions(imageModel)
+    if (current && ratios.length && !ratios.includes(current)) {
+      const next = preferredAspectRatio(ratios)
+      if (next) {
+        form.setFieldsValue({ aspect_ratio: next })
+        drafts.current.set(selected.id, structuredClone(form.getFieldsValue(true)))
+      }
+      return
+    }
+    if (!current) {
+      const next = preferredAspectRatio(ratios)
+      if (next) {
+        form.setFieldsValue({ aspect_ratio: next })
+        drafts.current.set(selected.id, structuredClone(form.getFieldsValue(true)))
+      }
+    }
   }, [form, imageModel, selected])
 
   const save = useCallback(async (announce = false) => {

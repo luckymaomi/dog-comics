@@ -95,7 +95,7 @@ export function ProjectsPage() {
         setModalOpen(false)
         return
       }
-      const project = await projectsApi.create({ ...values, style: 'realistic', metadata: { aspect_ratio: '9:16' } })
+      const project = await projectsApi.create({ ...values, style: 'realistic', metadata: { aspect_ratio: '4:3' } })
       message.success('漫画项目已创建')
       setModalOpen(false)
       form.resetFields()

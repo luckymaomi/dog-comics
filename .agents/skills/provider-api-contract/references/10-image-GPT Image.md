@@ -10,17 +10,20 @@ OpenAI GPT Image 系列文生图 / 图生图，支持高清 2K / 4K 输出。
 ## 模型 id 来源
 
 - **权威 id**：PearAPI `GET /v1/models` 返回的正式 `model` 字符串（如 `gpt-image-2.5-2k`）。
-- **静态专栏**：可能滞后；未逐条列出的同族清晰度档仍按族能力补洞。
+- **公开价目**：`GET /system/auth/models/all` 按同 id 挂 `pricing`；与可调用目录交集才进本仓展示价。
+- **静态专栏 / OpenAPI txt**：可能滞后；未逐条列出的同族清晰度档仍按族能力补洞。
 
 ## 本专栏能力（同族继承）
 
 | 族 / 示例 model_id | 画幅（aspect_ratio） | 参考图上限 |
 | :--- | :--- | ---: |
 | `gpt-image-2`、`gpt-image-2-2k`、`gpt-image-2-4k` | 9:16，16:9，1:1，3:2，2:3，4:3，3:4，5:4，4:5，2:1，1:2，21:9，9:21 | ≤ 16 |
-| `gpt-image-2.5`、`gpt-image-2.5-2k`、`gpt-image-2.5-4k`（目录正式 id） | 同上（13 种） | ≤ 16 |
+| `gpt-image-2.5`、`gpt-image-2.5-2k`、`gpt-image-2.5-4k`（目录与价目正式 id；静态 OpenAPI 可能未列） | 同上（13 种） | ≤ 16 |
 | `gpt-image-1.5` | 9:16，16:9，1:1 | ≤ 16 |
 
 模式：文生图与图生图均支持（目录补洞登记 `text2image` + `image2image`）。
+
+价目示例（公开接口，可能变动）：`gpt-image-2` / `2.5` / `2.5-2k` 约 ¥0.05；`gpt-image-2-4k` / `2.5-4k` 约 ¥0.14；`gpt-image-1.5` 约 ¥0.08。
 
 ## 接口（本专栏）
 
@@ -36,10 +39,11 @@ OpenAI GPT Image 系列文生图 / 图生图，支持高清 2K / 4K 输出。
 
 - 落点：`backend/src/providers/adapters/pearApi.ts` → `isGptImage2FamilyId` / `knownModelMetadata`
 - 匹配：`gpt-image-2(?:\.\d+)?(?:-(?:1k|2k|4k))?`，以及单独的 `gpt-image-1.5`
-- `source`：一律 `adapter-override`
-- 测试：`backend/test/dynamicModels.test.ts` 覆盖 2 / 2.5 清晰度档
+- `source`：一律 `adapter-override`（价目参考图提示不得覆盖）
+- 测试：`backend/test/dynamicModels.test.ts` 覆盖 2 / 2.5 清晰度档与价目合并
 
 ## 维护注意
 
 - 2 / 2.5 及 1k/2k/4k 清晰度档共享同一套参考图上限与 13 种画幅；`gpt-image-1.5` 仍是 3 种画幅。
 - 新版本小数点（如 `2.5`）属于目录正式 id，不是「偶发脏数据」。
+- 价目有价 ≠ 生成必成功；`gpt-image-2.5-4k` 若线上失败，按供应商错误面排查，不要从目录剔除同族 id。

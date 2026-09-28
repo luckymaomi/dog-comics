@@ -34,20 +34,32 @@ export function initializeNailongBackroomsDemo(
       : services.projects.create(definition);
     const episode = services.projects.saveEpisodes(project.id, [{
       episode_number: 1,
-      title: '第 1 话｜奶龙后室',
-      duration: NAILONG_BACKROOMS_DEMO.panels.length * NAILONG_BACKROOMS_DEMO.media.duration,
+      title: '第 1 话',
+      duration: Math.max(1, NAILONG_BACKROOMS_DEMO.panels.length) * NAILONG_BACKROOMS_DEMO.media.duration,
       script_content: NAILONG_BACKROOMS_DEMO.script,
       ...NAILONG_BACKROOMS_DEMO.episodePlan,
     }])[0];
     if (!episode) throw new Error('Demo 话初始化失败。');
+
+    const desiredNames = new Set([
+      ...NAILONG_BACKROOMS_DEMO.characters.map((item) => `character:${item.name}`),
+      ...NAILONG_BACKROOMS_DEMO.scenes.map((item) => `scene:${item.location}`),
+      ...NAILONG_BACKROOMS_DEMO.props.map((item) => `prop:${item.name}`),
+    ]);
+    for (const asset of services.assets.listProjectAssets(project.id)) {
+      if (!desiredNames.has(`${asset.kind}:${asset.name}`)) {
+        services.assets.deleteProjectAsset(asset.id);
+      }
+    }
 
     const projectAssets = [
       ...NAILONG_BACKROOMS_DEMO.characters.map((item) => ({
         kind: 'character' as const,
         name: item.name,
         text_profile: { ...item.text_profile },
-        output_type: 'character-layout-a' as const,
+        output_type: item.output_type,
         output_prompt: item.output_prompt,
+        input_reference_images: [] as string[],
       })),
       ...NAILONG_BACKROOMS_DEMO.scenes.map((item) => ({
         kind: 'scene' as const,
@@ -55,6 +67,7 @@ export function initializeNailongBackroomsDemo(
         text_profile: { ...item.text_profile },
         output_type: 'scene-panorama' as const,
         output_prompt: item.output_prompt,
+        input_reference_images: [] as string[],
       })),
       ...NAILONG_BACKROOMS_DEMO.props.map((item) => ({
         kind: 'prop' as const,
@@ -62,6 +75,7 @@ export function initializeNailongBackroomsDemo(
         text_profile: { ...item.text_profile },
         output_type: 'prop-multi-angle' as const,
         output_prompt: item.output_prompt,
+        input_reference_images: [] as string[],
       })),
     ].map((item) => {
       const bound = services.assets.listProjectAssets(project.id, item.kind).find((candidate) => candidate.name === item.name)
@@ -91,11 +105,12 @@ export function initializeNailongBackroomsDemo(
 }
 
 export function nailongBackroomsDemoComplete(project: Drama): boolean {
+  const expectedAssets = NAILONG_BACKROOMS_DEMO.characters.length
+    + NAILONG_BACKROOMS_DEMO.scenes.length
+    + NAILONG_BACKROOMS_DEMO.props.length;
   return project.metadata.demo_contract === NAILONG_BACKROOMS_DEMO.contract
-    && project.project_assets?.length === NAILONG_BACKROOMS_DEMO.characters.length
-      + NAILONG_BACKROOMS_DEMO.scenes.length
-      + NAILONG_BACKROOMS_DEMO.props.length
-    && project.episodes?.[0]?.panels?.length === NAILONG_BACKROOMS_DEMO.panels.length;
+    && project.project_assets?.length === expectedAssets
+    && (project.episodes?.[0]?.panels?.length ?? 0) === NAILONG_BACKROOMS_DEMO.panels.length;
 }
 
 /** @deprecated 旧名 */

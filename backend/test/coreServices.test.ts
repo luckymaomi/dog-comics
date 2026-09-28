@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+﻿import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -169,12 +169,12 @@ test('资产标准图生成消费用户保存的可见提示词和资产卡输�
         kind: asset.kind,
         name: asset.name,
         text_profile: asset.text_profile,
-        output_type: 'character-layout-b',
+        output_type: 'character-layout-a',
       }),
     });
     assert.equal(assembled.status, 200);
     const assembledData = await assembled.json() as { data: { output_type: string; output_prompt: string } };
-    assert.equal(assembledData.data.output_type, 'character-layout-b');
+    assert.equal(assembledData.data.output_type, 'character-layout-a');
     assert.match(assembledData.data.output_prompt, /红女王.*夜城女王.*左脸右身/su);
     assert.equal(/图片参考锁定|img2img/u.test(assembledData.data.output_prompt), false);
     const prompt = '用户重写：电影感红女王定妆图，黑色盘发，深红礼服。';

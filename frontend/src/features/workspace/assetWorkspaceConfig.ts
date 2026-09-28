@@ -90,10 +90,12 @@ export function buildBriefCopyText(kind: AssetKind, name: string, brief: string)
 
 export const outputTypeOptions: Record<AssetKind, Array<{ value: AssetOutputType; label: string }>> = {
   character: [
-    { value: 'character-layout-a', label: 'A 三栏三视图' },
-    { value: 'character-layout-b', label: 'B 左脸右身' },
-    { value: 'character-layout-c', label: 'C 4+3 双层' },
-    { value: 'character-layout-d', label: 'D 7 图锚点组' },
+    { value: 'character-layout-a', label: 'A 左脸右身' },
+    { value: 'character-layout-b', label: 'B 4+3 双层' },
+    { value: 'character-layout-c', label: 'C 7 图锚点组' },
+    { value: 'character-layout-d', label: 'D 表情 8 格' },
+    { value: 'character-layout-e', label: 'E 动作 8 格' },
+    { value: 'character-layout-f', label: 'F 叙事九宫格' },
   ],
   scene: [
     { value: 'scene-panorama', label: '空间全景' },
@@ -117,6 +119,13 @@ export const referenceLockOptions: Record<AssetKind, Array<{ value: ReferenceLoc
 export const banImageTextOptions: Array<{ value: ImageTextBanKind; label: string }> = [
   { value: 'ban', label: '禁止出字' },
 ]
+
+/** 打开资产卡时的表单默认：按类型预选锁脸/锁景/锁物、禁止出字；画幅默认由 preferredAspectRatio 倾向 4:3。 */
+export const DEFAULT_BAN_IMAGE_TEXT: ImageTextBanKind = 'ban'
+
+export function defaultReferenceLock(kind: AssetKind): ReferenceLockKind {
+  return kind === 'character' ? 'face' : kind === 'scene' ? 'scene' : 'prop'
+}
 
 export function profileSummary(profile: AssetTextProfile): string {
   return (profile[PROFILE_BRIEF_KEY] ?? '').trim()

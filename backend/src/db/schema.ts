@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS panels (
   image_url TEXT, current_image_generation_id INTEGER, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(episode_id, panel_number)
 );
 CREATE TABLE IF NOT EXISTS panel_project_assets (panel_id INTEGER NOT NULL REFERENCES panels(id) ON DELETE CASCADE, project_asset_id INTEGER NOT NULL REFERENCES project_assets(id) ON DELETE CASCADE, PRIMARY KEY(panel_id, project_asset_id));
-CREATE TABLE IF NOT EXISTS provider_model_catalog (provider TEXT NOT NULL, model_id TEXT NOT NULL, label TEXT NOT NULL, kind TEXT NOT NULL CHECK(kind IN ('image', 'video')), capabilities TEXT NOT NULL DEFAULT '{}', synchronized_at TEXT NOT NULL, PRIMARY KEY(provider, model_id, kind));
+CREATE TABLE IF NOT EXISTS provider_model_catalog (provider TEXT NOT NULL, model_id TEXT NOT NULL, label TEXT NOT NULL, kind TEXT NOT NULL CHECK(kind IN ('image', 'video')), capabilities TEXT NOT NULL DEFAULT '{}', pricing TEXT, synchronized_at TEXT NOT NULL, PRIMARY KEY(provider, model_id, kind));
 CREATE TABLE IF NOT EXISTS ai_model_presets (service_type TEXT PRIMARY KEY CHECK(service_type IN ('image')), provider TEXT NOT NULL, model_id TEXT NOT NULL, updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS async_tasks (id TEXT PRIMARY KEY, type TEXT NOT NULL, status TEXT NOT NULL, progress INTEGER NOT NULL DEFAULT -1, message TEXT, error TEXT, result TEXT, resource_id TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, completed_at TEXT);
 CREATE TABLE IF NOT EXISTS image_generations (
@@ -40,6 +40,7 @@ export function initializeDatabase(database: SQLiteDatabase): void {
   database.pragma('foreign_keys = ON');
   database.exec(SCHEMA);
   ensureColumn(database, 'image_generations', 'archive_attempts', 'INTEGER NOT NULL DEFAULT 0');
+  ensureColumn(database, 'provider_model_catalog', 'pricing', 'TEXT');
   dropColumnIfExists(database, 'panels', 'image_needs_review');
 }
 

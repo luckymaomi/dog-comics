@@ -62,7 +62,9 @@ export type CharacterOutputType =
   | 'character-layout-a'
   | 'character-layout-b'
   | 'character-layout-c'
-  | 'character-layout-d';
+  | 'character-layout-d'
+  | 'character-layout-e'
+  | 'character-layout-f';
 export type SceneOutputType = 'scene-panorama' | 'scene-detail' | 'scene-lighting-variant';
 export type PropOutputType = 'prop-multi-angle' | 'prop-state-variant';
 export type AssetOutputType = CharacterOutputType | SceneOutputType | PropOutputType;

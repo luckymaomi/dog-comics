@@ -14,8 +14,13 @@ async function main(): Promise<void> {
     initializeDatabase(db);
     const services = createServices(db, config, providerRegistry, logger);
     const project = initializeNailongBackroomsDemo(db, services, logger);
-    console.log(`《奶龙后室》Demo 已初始化：项目 ID ${project.id}`);
-    console.log('故事总览、项目资产和分镜规格已写入；未调用供应商或生成媒体。');
+    const characters = services.assets
+      .listProjectAssets(project.id)
+      .filter((asset) => asset.kind === 'character')
+      .map((asset) => `${asset.name}(${asset.output_type})`);
+    console.log(
+      `Demo 已初始化：项目 ID ${project.id}；角色 ${characters.join('、') || '(无)'}；无参考图、提示词留空待组装。`,
+    );
   } finally {
     closeDb();
   }

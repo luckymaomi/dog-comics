@@ -61,6 +61,8 @@ describe('动态模型目录选择', () => {
     expect(aspectRatiosFor([model])).toEqual(['1:1', '9:16'])
     expect(preferredAspectRatio(model.capabilities.aspectRatios || [])).toBe('1:1')
     expect(preferredAspectRatio(model.capabilities.aspectRatios || [], '9:16')).toBe('9:16')
+    expect(preferredAspectRatio(['1:1', '4:3', '9:16'])).toBe('4:3')
+    expect(preferredAspectRatio(['16:9', '9:16', '4:3'], '16:9')).toBe('16:9')
     expect(aspectRatioLabel('9:16')).toBe('9:16 · 竖屏短视频')
     expect(providerSupportsMode(capabilities, 'image-to-image')).toBe(true)
     expect(providerSupportsMode(capabilities, 'text-to-video')).toBe(false)

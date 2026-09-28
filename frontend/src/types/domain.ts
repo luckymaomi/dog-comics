@@ -57,6 +57,8 @@ export type AssetOutputType =
   | "character-layout-b"
   | "character-layout-c"
   | "character-layout-d"
+  | "character-layout-e"
+  | "character-layout-f"
   | "scene-panorama"
   | "scene-detail"
   | "scene-lighting-variant"
@@ -148,6 +150,12 @@ export interface ProviderModel {
     supportsDuration?: boolean;
     supportedDurations?: number[] | null;
     source: "provider" | "adapter" | "adapter-override" | "unknown";
+  };
+  pricing?: {
+    price: number | null;
+    currency: "CNY";
+    billingType: string | null;
+    summary: string | null;
   };
   synchronized_at: string;
 }

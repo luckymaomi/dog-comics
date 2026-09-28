@@ -1,4 +1,5 @@
 import type { AiModelPreset, AiModelPresets, ProviderCatalogStatus, ProviderModel, ServiceType } from '../../types/domain'
+import { modelPricingLabel } from './catalog'
 
 export interface ModelPresetOption {
   value: string
@@ -39,10 +40,15 @@ export function modelPresetOptions(
     .map((provider) => [provider.id, provider.label]))
   const options: ModelPresetOption[] = models
     .filter((model) => model.kind === serviceType && usableProviders.has(model.provider))
-    .map((model) => ({
-      value: modelPresetKey({ provider: model.provider, model: model.id }) as string,
-      label: `${usableProviders.get(model.provider)} · ${model.id}`,
-    }))
+    .map((model) => {
+      const price = modelPricingLabel(model)
+      return {
+        value: modelPresetKey({ provider: model.provider, model: model.id }) as string,
+        label: price
+          ? `${usableProviders.get(model.provider)} · ${model.id} · ${price}`
+          : `${usableProviders.get(model.provider)} · ${model.id}`,
+      }
+    })
   const currentKey = modelPresetKey(current)
   if (current && currentKey && !options.some((option) => option.value === currentKey)) {
     options.unshift({

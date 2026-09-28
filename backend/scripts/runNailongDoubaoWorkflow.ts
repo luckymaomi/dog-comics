@@ -154,7 +154,7 @@ async function main(): Promise<void> {
 
     for (const asset of services.assets.listProjectAssets(project.id)) {
       if (asset.kind === "character" && asset.name === "奶龙") {
-        const outputType = "character-layout-d" as const;
+        const outputType = "character-layout-c" as const;
         const prompt = [
           assembleAssetOutputPrompt({
             kind: asset.kind,

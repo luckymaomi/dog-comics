@@ -1,6 +1,6 @@
 import type {
   ImageProviderRequest, ImageProviderResult, ProviderAdapter, ProviderExecutionContext,
-  ProviderModel, ProviderModelCapabilities, ProviderModelDiscoveryInput, ProviderTaskStatus,
+  ProviderModel, ProviderModelCapabilities, ProviderModelDiscoveryInput, ProviderModelPricing, ProviderTaskStatus,
   VideoProviderRequest, VideoProviderResult,
 } from '../contracts';
 import { modelCapabilities } from '../modelCapabilities';
@@ -9,6 +9,11 @@ import { requestProviderJson, type ProviderFetch } from '../transport';
 
 type JsonRecord = Record<string, unknown>;
 interface PearModelMetadata { model_id?: unknown; model_name?: unknown; model_type?: unknown; channel_type?: unknown; reference_image?: unknown; aspect_ratio?: unknown; supported_modes?: unknown; duration_mode?: unknown; duration_type?: unknown; billing_type?: unknown; charge_type?: unknown; pricing_type?: unknown; supported_durations?: unknown; durations?: unknown }
+interface PearPricingEntry {
+  modelId: string;
+  pricing: ProviderModelPricing;
+  metadata: PearModelMetadata;
+}
 
 /** PearAPI 官方 /v1 协议适配器；旧 /api/*、generation_key 与兼容视频字段均不再使用。 */
 export function createPearApiAdapter(fetchImpl: ProviderFetch = fetch): ProviderAdapter {
@@ -23,14 +28,82 @@ export function createPearApiAdapter(fetchImpl: ProviderFetch = fetch): Provider
 }
 
 async function listModels(input: ProviderModelDiscoveryInput, fetchImpl: ProviderFetch): Promise<ProviderModel[]> {
-  const response = await requestProviderJson<JsonRecord>({ providerId: 'pearapi', url: `${normalizeBaseUrl(input.baseUrl)}/v1/models`, method: 'GET', headers: { Authorization: `Bearer ${required(input.apiKey, 'PearAPI API Key')}` }, signal: input.signal }, fetchImpl);
+  const baseUrl = normalizeBaseUrl(input.baseUrl);
+  const response = await requestProviderJson<JsonRecord>({ providerId: 'pearapi', url: `${baseUrl}/v1/models`, method: 'GET', headers: { Authorization: `Bearer ${required(input.apiKey, 'PearAPI API Key')}` }, signal: input.signal }, fetchImpl);
   const items = Array.isArray(response.data.data) ? response.data.data : [];
-  const models = items.map(normalizePearModel).filter((model): model is ProviderModel => Boolean(model)).filter((model) => !input.serviceType || model.kind === input.serviceType);
+  const pricingById = await fetchPublicPricingCatalog(baseUrl, input.signal, fetchImpl);
+  const models = items
+    .map((item) => normalizePearModel(item, pricingById.get(readString(asRecord(item)?.id)?.toLowerCase() || '')))
+    .filter((model): model is ProviderModel => Boolean(model))
+    .filter((model) => !input.serviceType || model.kind === input.serviceType);
   if (!models.length) throw invalidResponse(response.data, 'PearAPI 模型目录没有返回可用模型');
   return models;
 }
 
-function normalizePearModel(value: unknown): ProviderModel | undefined {
+/** 公开价目：不鉴权；失败时目录仍可用，仅缺价。 */
+async function fetchPublicPricingCatalog(
+  baseUrl: string,
+  signal: AbortSignal | undefined,
+  fetchImpl: ProviderFetch,
+): Promise<Map<string, PearPricingEntry>> {
+  try {
+    const response = await requestProviderJson<JsonRecord>({
+      providerId: 'pearapi',
+      url: `${baseUrl}/system/auth/models/all`,
+      method: 'GET',
+      signal,
+      maxAttempts: 2,
+      retryNetworkErrors: true,
+    }, fetchImpl);
+    const items = Array.isArray(response.data.data) ? response.data.data : Array.isArray(response.data) ? response.data : [];
+    const map = new Map<string, PearPricingEntry>();
+    for (const item of items) {
+      const entry = normalizePricingEntry(item);
+      if (entry) map.set(entry.modelId.toLowerCase(), entry);
+    }
+    return map;
+  } catch {
+    return new Map();
+  }
+}
+
+function normalizePricingEntry(value: unknown): PearPricingEntry | undefined {
+  const item = asRecord(value);
+  // 公开价目用 model_id；勿把 /v1/models 的 { id } 行误当成价目
+  const modelId = readString(item?.model_id);
+  if (!modelId) return undefined;
+  const summaryRecord = asRecord(item?.billing_summary);
+  const price = readFiniteNumber(item?.price ?? item?.amount);
+  const billingType = readString(item?.billing_type) || readString(item?.billing_detail && asRecord(item.billing_detail)?.mode) || null;
+  return {
+    modelId,
+    pricing: {
+      price,
+      currency: 'CNY',
+      billingType,
+      summary: readString(summaryRecord?.zh) || readString(item?.billing_summary) || formatPricingSummary(price, billingType),
+    },
+    metadata: {
+      model_id: modelId,
+      model_name: item?.model_name,
+      model_type: item?.model_type,
+      channel_type: item?.channel_type,
+      reference_image: item?.reference_image,
+      aspect_ratio: item?.aspect_ratio,
+      supported_modes: item?.supported_modes,
+      billing_type: billingType,
+      supported_durations: item?.duration_seconds_list,
+    },
+  };
+}
+
+function formatPricingSummary(price: number | null, billingType: string | null): string | null {
+  if (price === null) return null;
+  const unit = billingType && /duration|second|时长/iu.test(billingType) ? '按时长' : '按次';
+  return `${unit} ¥${price}`;
+}
+
+function normalizePearModel(value: unknown, pricingEntry?: PearPricingEntry): ProviderModel | undefined {
   const item = asRecord(value); const id = readString(item?.id); const endpoints = arrayStrings(item?.supported_endpoint_types); const rawType = readString(item?.model_type)?.toLowerCase();
   if (!id) return undefined;
   const kind = rawType === 'image'
@@ -43,14 +116,35 @@ function normalizePearModel(value: unknown): ProviderModel | undefined {
           ? 'image'
           : endpoints.some((entry) => /video/iu.test(entry))
             ? 'video'
-            : endpoints.length ? undefined : inferModelKind(id);
+            : endpoints.length ? undefined : inferModelKind(id) || inferModelKind(pricingEntry?.modelId || '');
   if (!kind) return undefined;
   const known = isKnownModelOverride(id);
+  // 能力权威：adapter-override 族合同 > /v1/models 字段 > 公开价目提示（仅填补未知）
+  const catalogMetadata = knownModelMetadata(id, item || {});
+  const metadata = known
+    ? catalogMetadata
+    : mergeProviderMetadata(catalogMetadata, pricingEntry?.metadata);
   return {
     id,
-    label: readString(item?.model) || readString(item?.name) || id,
+    label: readString(item?.model) || readString(item?.name) || pricingEntry?.modelId || id,
     kind,
-    capabilities: pearModelCapabilities(id, kind, endpoints, knownModelMetadata(id, item || {}), known ? 'adapter-override' : 'provider'),
+    capabilities: pearModelCapabilities(id, kind, endpoints, metadata, known ? 'adapter-override' : 'provider'),
+    ...(pricingEntry ? { pricing: pricingEntry.pricing } : {}),
+  };
+}
+
+/** 价目仅补洞未知字段，不覆盖 /v1/models 已给出的能力。 */
+function mergeProviderMetadata(primary: PearModelMetadata, secondary?: PearModelMetadata): PearModelMetadata {
+  if (!secondary) return primary;
+  return {
+    ...secondary,
+    ...primary,
+    reference_image: primary.reference_image ?? secondary.reference_image,
+    aspect_ratio: primary.aspect_ratio ?? secondary.aspect_ratio,
+    supported_modes: primary.supported_modes ?? secondary.supported_modes,
+    supported_durations: primary.supported_durations ?? secondary.supported_durations,
+    durations: primary.durations ?? secondary.durations,
+    billing_type: primary.billing_type ?? secondary.billing_type,
   };
 }
 
@@ -201,6 +295,11 @@ function invalidResponse(details: unknown, message: string): ProviderError { ret
 function required(value: unknown, label: string): string { const text = readString(value); if (text) return text; throw new ProviderError({ providerId: 'pearapi', code: 'configuration', message: `${label}不能为空` }); }
 function asRecord(value: unknown): JsonRecord | undefined { return value !== null && typeof value === 'object' && !Array.isArray(value) ? value as JsonRecord : undefined; }
 function readString(value: unknown): string | undefined { return typeof value === 'string' && value.trim() ? value.trim() : undefined; }
+function readFiniteNumber(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
 function readProgress(value: unknown): number | undefined { return typeof value === 'number' && Number.isFinite(value) ? value : undefined; }
 function readNonNegativeInteger(value: unknown): number | null { const number = Number(value); return Number.isInteger(number) && number >= 0 ? number : null; }
 function readDurations(value: unknown): number[] | null { if (!Array.isArray(value)) return null; const durations = [...new Set(value.map((entry) => Number(entry)).filter((entry) => Number.isFinite(entry) && entry > 0))].map((entry) => Math.round(entry)).sort((a, b) => a - b); return durations.length ? durations : null; }

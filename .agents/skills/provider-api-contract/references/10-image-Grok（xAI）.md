@@ -11,7 +11,8 @@ xAI Grok **图像**模型。
 
 ## 模型 id 来源
 
-- **权威 id**：PearAPI `GET /v1/models` 返回的正式字符串，例如 `grok-imagine-image-2`、`grok-imagine-image-2-2k`。
+- **权威 id**：PearAPI `GET /v1/models` 返回的正式字符串，例如 `grok-imagine-image-2`、`grok-imagine-image-2.0`、`grok-imagine-image-2-2k`。
+- **公开价目**：实测常见正式 id 为 `grok-imagine-image-2.0`（约 ¥0.05/次）；静态专栏可能只写 `grok-imagine-image`。
 - **静态专栏**：可能只写统一名 `grok-imagine-image`；目录变体与清晰度档按同族能力补洞。
 - **旧别名**（官方描述）：`grok-3-image`、`grok-4-image`。
 
@@ -20,10 +21,11 @@ xAI Grok **图像**模型。
 | 示例 model_id | 画幅（aspect_ratio） | 参考图上限 |
 | :--- | :--- | ---: |
 | `grok-imagine-image` | 1:1，16:9，9:16，4:3，3:4，3:2，2:3，2:1，1:2，19.5:9，9:19.5，20:9，9:20 | ≤ 4 |
-| `grok-imagine-image-2`、`grok-imagine-image-2-2k`（目录正式 id） | 同上（13 种） | ≤ 4 |
+| `grok-imagine-image-2`、`grok-imagine-image-2.0`、`grok-imagine-image-2-2k`（目录正式 id） | 同上（13 种） | ≤ 4 |
 | `grok-3-image`、`grok-4-image` | 同上 | ≤ 4 |
 
-模式：官方示例含文生图与图生图（`image` 字段）。
+模式：官方示例含文生图与图生图（`image` 字段）。  
+注意：价目偶发把参考图写成 `1`；本仓仍以专栏核验的 ≤4 为准（`adapter-override`）。
 
 ## 接口（本专栏）
 

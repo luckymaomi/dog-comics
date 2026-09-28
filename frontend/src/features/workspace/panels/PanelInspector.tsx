@@ -27,7 +27,10 @@ import {
 import type { MediaGenerationHistory } from "../../../api/media";
 import type { PanelReadiness } from "../../../api/workspace";
 import { GenerationElapsedTime } from "../../generation/GenerationElapsedTime";
-import { modelCapabilitySummary } from "../../providers/catalog";
+import {
+  modelCapabilitySummary,
+  modelPricingLabel,
+} from "../../providers/catalog";
 import type {
   AssetKind,
   Panel,
@@ -590,7 +593,15 @@ function HistoryList(props: {
   );
 }
 
-export function ModelSummary(props: { model?: ProviderModel; label: string }) {
+export function ModelSummary(props: {
+  model?: ProviderModel;
+  label: string;
+  /** 触发器小标题；资产页用「资产图片模型」，分镜台默认「底板图片模型」。 */
+  title?: string;
+}) {
+  const title = props.title ?? "底板图片模型";
+  const price = props.model ? modelPricingLabel(props.model) : undefined;
+  const headline = price ? `${props.label} · ${price}` : props.label;
   return (
     <Popover
       trigger="click"
@@ -600,10 +611,15 @@ export function ModelSummary(props: { model?: ProviderModel; label: string }) {
             <span>当前图片模型</span>
             <strong>{props.label}</strong>
             <p>
-              {props.model
-                ? modelCapabilitySummary(props.model)
-                : "请到 AI 配置手动选择图片预设"}
+              {price
+                ? `公开价目 ${price}`
+                : props.model
+                  ? "目录未标价"
+                  : "请到 AI 配置手动选择图片预设"}
             </p>
+            {props.model ? (
+              <p>{modelCapabilitySummary(props.model)}</p>
+            ) : null}
           </section>
         </div>
       }
@@ -611,11 +627,11 @@ export function ModelSummary(props: { model?: ProviderModel; label: string }) {
       <button
         type="button"
         className="workspace-model-trigger"
-        aria-label="查看当前图片模型能力"
+        aria-label={`查看当前${title}与价目`}
       >
         <span>
-          <small>底板图片模型</small>
-          <strong>{props.label}</strong>
+          <small>{title}</small>
+          <strong>{headline}</strong>
         </span>
         <DownOutlined />
       </button>

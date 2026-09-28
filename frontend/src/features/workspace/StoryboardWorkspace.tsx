@@ -26,6 +26,7 @@ import {
   panelPayload,
   type PanelFormValues,
 } from "./panels/panelForm";
+import { preferredAspectRatio } from "../providers/catalog";
 
 export function PanelWorkspace() {
   const { message, modal } = App.useApp();
@@ -192,11 +193,27 @@ export function PanelWorkspace() {
         assets,
         "prop",
       ),
-      aspect_ratio: null,
+      aspect_ratio: preferredAspectRatio(
+        imageModel?.capabilities.aspectRatios ?? [],
+      ),
     });
     hydratingPanel.current = false;
     void loadHistory(selected.id);
   }, [assets, form, loadHistory, selected]);
+
+  useEffect(() => {
+    if (!selected || !imageModel) return;
+    const current = form.getFieldValue("aspect_ratio") as string | null | undefined;
+    const ratios = imageModel.capabilities.aspectRatios ?? [];
+    if (current && ratios.length && !ratios.includes(current)) {
+      form.setFieldsValue({ aspect_ratio: preferredAspectRatio(ratios) });
+      return;
+    }
+    if (!current) {
+      const next = preferredAspectRatio(ratios);
+      if (next) form.setFieldsValue({ aspect_ratio: next });
+    }
+  }, [form, imageModel, selected]);
 
   const save = useCallback(async () => {
     if (!selected) return;

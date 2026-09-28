@@ -232,7 +232,7 @@ async function main(): Promise<void> {
     const assetsBefore = services.assets.listProjectAssets(project.id);
     for (const asset of assetsBefore) {
       if (asset.kind === "character" && asset.name === "女王") {
-        const outputType = "character-layout-b" as const;
+        const outputType = "character-layout-a" as const;
         const assembled = assembleAssetOutputPrompt({
           kind: asset.kind,
           name: asset.name,

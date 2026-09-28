@@ -121,7 +121,11 @@ test('PearAPI Doubao Seedream 按文档补全 10 张参考图与 8 种画幅，U
 test('PearAPI 只使用 Bearer /v1/models，并为已核验 GPT Image 2 模型补充能力', async () => {
   const requests: Array<{ url: string; method: string; authorization?: string }> = [];
   const adapter = createPearApiAdapter(async (input, init) => {
-    requests.push({ url: String(input), method: String(init?.method), authorization: (init?.headers as Record<string, string> | undefined)?.Authorization });
+    const url = String(input);
+    requests.push({ url, method: String(init?.method), authorization: (init?.headers as Record<string, string> | undefined)?.Authorization });
+    if (url.endsWith('/system/auth/models/all')) {
+      return Response.json({ data: [] });
+    }
     return Response.json({ object: 'list', data: [{ id: 'gpt-image-2', object: 'model', created: 0, owned_by: 'pearapi' }] });
   });
 
@@ -131,7 +135,73 @@ test('PearAPI 只使用 Bearer /v1/models，并为已核验 GPT Image 2 模型�
       capabilities: { modes: ['text-to-image', 'image-to-image'], maxReferenceImages: 16, aspectRatios: ['9:16', '16:9', '1:1', '3:2', '2:3', '4:3', '3:4', '5:4', '4:5', '2:1', '1:2', '21:9', '9:21'], billingMode: 'unknown', supportsDuration: false, supportedDurations: null, source: 'adapter-override' },
     },
   ]);
-  assert.deepEqual(requests, [{ url: 'https://api.pearapi.ai/v1/models', method: 'GET', authorization: 'Bearer sk-test' }]);
+  assert.equal(requests[0]?.url, 'https://api.pearapi.ai/v1/models');
+  assert.equal(requests[0]?.authorization, 'Bearer sk-test');
+  assert.equal(requests[1]?.url, 'https://api.pearapi.ai/system/auth/models/all');
+  assert.equal(requests[1]?.authorization, undefined);
+});
+
+test('PearAPI 刷新目录时合并公开价目，且价目能力不得覆盖 adapter-override', async () => {
+  const adapter = createPearApiAdapter(async (input) => {
+    const url = String(input);
+    if (url.endsWith('/system/auth/models/all')) {
+      return Response.json({
+        data: [
+          {
+            model_id: 'gpt-image-2.5-4k',
+            model_type: 'image',
+            price: 0.14,
+            billing_type: 'count',
+            billing_summary: { zh: '按次 ¥0.14' },
+            reference_image: 1,
+            aspect_ratio: '1:1',
+          },
+          {
+            model_id: 'future-priced-image',
+            model_type: 'image',
+            price: 0.2,
+            billing_type: 'count',
+            billing_summary: { zh: '按次 ¥0.2' },
+            reference_image: 3,
+            aspect_ratio: '1:1，16:9',
+          },
+        ],
+      });
+    }
+    return Response.json({
+      data: [
+        { id: 'gpt-image-2.5-4k', object: 'model' },
+        { id: 'future-priced-image', model_type: 'image', supported_endpoint_types: ['images.generations'] },
+      ],
+    });
+  });
+  const models = await adapter.listModels!({ apiKey: 'sk-test', serviceType: 'image' });
+  const gpt = models.find((model) => model.id === 'gpt-image-2.5-4k');
+  assert.deepEqual(gpt?.pricing, {
+    price: 0.14, currency: 'CNY', billingType: 'count', summary: '按次 ¥0.14',
+  });
+  assert.equal(gpt?.capabilities.maxReferenceImages, 16);
+  assert.equal(gpt?.capabilities.aspectRatios?.length, 13);
+  assert.equal(gpt?.capabilities.source, 'adapter-override');
+  const priced = models.find((model) => model.id === 'future-priced-image');
+  assert.deepEqual(priced?.pricing, {
+    price: 0.2, currency: 'CNY', billingType: 'count', summary: '按次 ¥0.2',
+  });
+  assert.equal(priced?.capabilities.maxReferenceImages, 3);
+  assert.deepEqual(priced?.capabilities.aspectRatios, ['1:1', '16:9']);
+  assert.equal(priced?.capabilities.source, 'provider');
+});
+
+test('PearAPI 公开价目失败时仍返回 /v1/models 目录', async () => {
+  const adapter = createPearApiAdapter(async (input) => {
+    if (String(input).endsWith('/system/auth/models/all')) {
+      return new Response('boom', { status: 500 });
+    }
+    return Response.json({ data: [{ id: 'gpt-image-2', object: 'model' }] });
+  });
+  const [model] = await adapter.listModels!({ apiKey: 'sk-test', serviceType: 'image' });
+  assert.equal(model?.id, 'gpt-image-2');
+  assert.equal(model?.pricing, undefined);
 });
 
 test('PearAPI 模型目录缺少 Bearer Token 时明确拒绝', async () => {

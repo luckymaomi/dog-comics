@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+﻿import assert from "node:assert/strict";
 import test from "node:test";
 import Database from "better-sqlite3";
 import { initializeDatabase } from "../src/db/schema";
@@ -39,7 +39,7 @@ test("项目资产库保存三类结构化卡和各自的生成输入参考图",
         brief:
           "32岁女性；冷峻鹅蛋脸，细长眼与高鼻梁，黑色盘发，高挑冷白；深红加冕礼服；审视",
       },
-      output_type: "character-layout-d",
+      output_type: "character-layout-c",
       output_prompt: "红女王七图身份锚点组，保持同一造型。",
       input_reference_images: [
         "/static/uploads/queen-face.png",
@@ -83,7 +83,7 @@ test("项目资产库保存三类结构化卡和各自的生成输入参考图",
           kind: "character",
           name: "红女王（加冕）",
           text_profile: character.text_profile,
-          output_type: "character-layout-d",
+          output_type: "character-layout-c",
           output_prompt: "红女王七图身份锚点组，保持同一造型。",
           input_reference_images: [
             "/static/uploads/queen-face.png",

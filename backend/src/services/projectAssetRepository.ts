@@ -21,6 +21,8 @@ const OUTPUT_TYPES: Record<AssetKind, readonly AssetOutputType[]> = {
     "character-layout-b",
     "character-layout-c",
     "character-layout-d",
+    "character-layout-e",
+    "character-layout-f",
   ],
   scene: ["scene-panorama", "scene-detail", "scene-lighting-variant"],
   prop: ["prop-multi-angle", "prop-state-variant"],

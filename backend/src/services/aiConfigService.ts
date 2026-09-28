@@ -7,6 +7,7 @@ import {
   type ProviderKind,
   type ProviderModel,
   type ProviderModelMode,
+  type ProviderModelPricing,
   type ProviderRegistry,
 } from '../providers';
 import type { AiModelPreset, AiModelPresets, AiServiceConfig, AiServiceType, ProviderCatalogStatus, ProviderModelSnapshot } from '../types/ai';
@@ -20,6 +21,7 @@ interface CatalogRow {
   label: string;
   kind: ProviderKind;
   capabilities: string;
+  pricing: string | null;
   synchronized_at: string;
 }
 
@@ -66,14 +68,18 @@ export class AiConfigService {
 
   models(provider?: string, serviceType?: AiServiceType): ProviderModelSnapshot[] {
     const providerId = provider ? this.requireAdapter(provider).descriptor.id : undefined;
-    return this.catalogRows(providerId, serviceType).map((row) => ({
-      provider: row.provider,
-      id: row.model_id,
-      label: row.label,
-      kind: row.kind,
-      capabilities: parseModelCapabilities(row.capabilities),
-      synchronized_at: row.synchronized_at,
-    }));
+    return this.catalogRows(providerId, serviceType).map((row) => {
+      const pricing = parseModelPricing(row.pricing);
+      return {
+        provider: row.provider,
+        id: row.model_id,
+        label: row.label,
+        kind: row.kind,
+        capabilities: parseModelCapabilities(row.capabilities),
+        ...(pricing ? { pricing } : {}),
+        synchronized_at: row.synchronized_at,
+      };
+    });
   }
 
   presets(): AiModelPresets {
@@ -248,11 +254,19 @@ export class AiConfigService {
         this.db.prepare('DELETE FROM provider_model_catalog WHERE provider = ?').run(provider);
       }
       const insert = this.db.prepare(`
-        INSERT INTO provider_model_catalog (provider, model_id, label, kind, capabilities, synchronized_at)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO provider_model_catalog (provider, model_id, label, kind, capabilities, pricing, synchronized_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
       for (const model of models) {
-        insert.run(provider, model.id, model.label, model.kind, JSON.stringify(model.capabilities), synchronizedAt);
+        insert.run(
+          provider,
+          model.id,
+          model.label,
+          model.kind,
+          JSON.stringify(model.capabilities),
+          model.pricing ? JSON.stringify(model.pricing) : null,
+          synchronizedAt,
+        );
       }
     });
     replace();
@@ -368,4 +382,25 @@ function modeLabel(mode: ProviderModelMode): string {
     'image-to-video': '图生视频',
   };
   return labels[mode];
+}
+
+function parseModelPricing(value: string | null | undefined): ProviderModelPricing | undefined {
+  if (!value) return undefined;
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return undefined;
+    const record = parsed as Record<string, unknown>;
+    const price = record.price === null || record.price === undefined || record.price === ''
+      ? null
+      : Number(record.price);
+    if (price !== null && !Number.isFinite(price)) return undefined;
+    return {
+      price,
+      currency: 'CNY',
+      billingType: typeof record.billingType === 'string' ? record.billingType : null,
+      summary: typeof record.summary === 'string' && record.summary.trim() ? record.summary.trim() : null,
+    };
+  } catch {
+    return undefined;
+  }
 }

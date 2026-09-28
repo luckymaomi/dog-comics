@@ -6,13 +6,16 @@
 
 生视频合同不在本 Skill 的 `references/` 中维护。视频能力若仍存在于适配器代码，以代码与单独视频任务为准，不得从本目录图片专栏推导。
 
-## 能力分层（必须遵守）
+## 能力与价目分层（必须遵守）
 
-1. **供应商实时目录**（`/v1/models`）原始字段。
-2. **适配器已核验补洞**（`source: adapter-override`），只允许登记本目录已写明的模型族。
-3. **业务服务通用校验**（手选模型、手选画幅、参考图数量门闸）。
+1. **可调用目录**（鉴权 `GET /v1/models`）：哪些 model id 当前可刷新进本仓目录；这是可用性权威。
+2. **公开价目**（无鉴权 `GET /system/auth/models/all`）：按 `model_id`（大小写不敏感）合并到目录条目的 `pricing`（`price` / `billing_type` / `billing_summary`）。价目失败时目录仍可用，仅缺价。
+3. **适配器已核验补洞**（`source: adapter-override`）：只允许登记本目录已写明的模型族；**价目里的 reference_image / aspect_ratio 不得覆盖** override。
+4. **业务服务通用校验**（手选模型、手选画幅、参考图数量门闸）。
 
-业务层只消费 `ProviderModelCapabilities`，不得按 provider 名或 model id 分支。协议字段差异只在 `backend/src/providers/adapters/pearApi.ts`（及 Agnes 适配器）内处理。未知能力保持 `null` / `unknown`，禁止从 schema 示例或其它专栏猜测。
+对未覆盖族：价目字段可补 `/v1/models` 未给出的未知能力（`source` 仍为 `provider`）。静态 OpenAPI/桌面 txt 可能滞后于实时目录与价目（例如 GPT Image 2.5 清晰度档）；以 `/v1/models` id + 同族合同为准，不得因静态文档缺席而丢弃目录 id。
+
+业务层只消费 `ProviderModelCapabilities`（与可选 `pricing` 展示），不得按 provider 名或 model id 分支。协议字段差异只在 `backend/src/providers/adapters/pearApi.ts`（及 Agnes 适配器）内处理。未知能力保持 `null` / `unknown`，禁止从 schema 示例或其它专栏猜测。
 
 ## 能力字段含义
 
@@ -22,6 +25,7 @@
 | `maxReferenceImages` | 辅助参考图上限；超限必须拒绝，禁止静默丢图 |
 | `aspectRatios` | 已验证画幅集合；未知为 `null`，禁止注入通用比例表 |
 | `source` | `provider` 或 `adapter-override`，必须可审计 |
+| `pricing` | 公开价目投影：`price`（CNY）、`billingType`、`summary`；与视频 `billingMode` 无关 |
 | `billingMode` / `supportedDurations` | 生图专栏通常不使用；勿用视频计费规则污染生图 |
 
 生成请求必须显式给出模型与画幅；缺少时后端拒绝，不能取第一项或供应商默认值。

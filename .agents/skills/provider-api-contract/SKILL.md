@@ -19,8 +19,8 @@ description: "维护并验证 potato 的 PearAPI/Agnes 生图 Provider API 协�
    - Doubao（豆包 Seedream） → `references/10-image-Doubao（豆包 Seedream）.md`
    - Agnes 生图 → `references/20-agnes-image.md`（官方 wiki：`agnes-image-2.5/2.1/2.0-flash`）
 2. 外部桌面源文件删除后不作为运行时依赖；以本目录合同为准。Agnes 以 wiki.agnes-ai.com / agnes-ai.com 已拉取页面为证据；PearAPI 以本目录 `10-image-*.md` 为准。标准化文档不能替代仍可取得的源证据。
-3. 能力三层：供应商目录原始字段 → 适配器已核验补洞（`source: adapter-override`）→ 业务通用校验。未知保持 `null`/`unknown`，禁止从示例或其它专栏猜测。目录正式 id 以供应商返回为准；静态专栏滞后时按同族能力补洞，不得把目录 id 当成脏数据丢掉。
-4. 业务层只消费 `ProviderModelCapabilities`，不得按 provider 名或 model id 分支。协议差异只在适配器内处理。Agnes 与 PearAPI **不得**互相推导。
+3. 能力四层：可调用目录（`/v1/models`）→ 公开价目（`/system/auth/models/all` → `pricing`）→ 适配器已核验补洞（`source: adapter-override`，价目不得覆盖）→ 业务通用校验。未知保持 `null`/`unknown`，禁止从示例或其它专栏猜测。目录正式 id 以供应商返回为准；静态专栏滞后时按同族能力补洞，不得把目录 id 当成脏数据丢掉。
+4. 业务层只消费 `ProviderModelCapabilities`（与可选 `pricing` 展示），不得按 provider 名或 model id 分支。协议差异只在适配器内处理。Agnes 与 PearAPI **不得**互相推导。
 5. PearAPI 生图：`POST /v1/images/generations`（及官方 `edits`）、异步 `GET /v1/images/tasks/{id}`，Bearer 鉴权。本仓固定 `response_format=url` 与 `task_type=async`（见通用合同）。
 6. 适配器成功止于可下载 URL；`remote` → 本地归档 → `/static` 指针由 media-archive / `ImageGenerationService` 负责。HTTP 200、Mock task id、测试绿灯不能证明真实出片与本地归档完成。
 7. 每次能力变更至少增加目录能力测试；涉及拒绝规则时覆盖非法参考图数或画幅。

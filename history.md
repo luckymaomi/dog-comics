@@ -819,3 +819,40 @@
 - 新增 `10-image-Doubao（豆包 Seedream）.md`；`provider-api-contract` / `provider-integration` / 通用合同索引同步。
 - `pearApi.ts`：`doubao-seedream-*` 与 `jimeng-4.0/4.5/5.0` 补洞为 10 张参考图 + 8 种画幅；`SeedVR2-Upscaler` 单独 1 张、画幅未知。`dynamicModels` 测覆盖。
 - 优选 `doubao-seedream-5-0-260128` 跑三资产 4:3 + 分镜 1:1（`run:nailong-doubao`）。
+- 实测：奶龙 / 后室一次完成；笑影实体因服务重启中断后重试至第 5 次完成；分镜完成。脚本打印「全流程完成」后因 DB 已关闭触发 `TaskService` 收尾异常（exit 1），出图已落盘：`/static/projects/1/images/{9,10,15,16}.jpg`。
+
+## 2026-09-28：PearAPI 公开价目并入模型目录
+
+- Owner：把公开 `GET /system/auth/models/all` 接到 AI 配置的模型刷新；对照 skill 与实时 id/价是否一致，并统一映射。
+- 权威分层写入通用合同：`/v1/models`=可调用 id；公开价目=按 `model_id` 合并 `pricing`；`adapter-override` 能力不被价目覆盖；静态 OpenAPI 可滞后。
+- `pearApi.listModels` 并行拉价目；目录持久化新增 `pricing` 列；AI 配置卡与预设下拉展示「按次 ¥x」。
+- 调研差异：GPT 2.5* 在价目有价、静态 GPT OpenAPI 可能未列；价目有 `doubao-seedream-5-0-pro-260628`、`grok-imagine-image-2.0`；Nano 价目多为 `pro-1k/2k/4k`。专栏补洞与说明已同步；`gpt-image-2.5-4k` 有价≠生成必成功，不从目录剔除。
+- 验证：后端 `dynamicModels` 全绿、`typecheck` 通过；前端 `build` 通过。
+
+## 2026-09-28：奶龙 Demo 改为三视图角色卡
+
+- Owner：先不管分镜；模板改成三个奶龙人物卡（正视/侧视/背视）；角色描述留空，靠狂笑参考图锁身份；清库后重初始化供审核。
+- 合同升至 `asset-output-pipeline-v14-nailong-views`；去掉后室/笑影/分镜规格；初始化脚本挂上 `奶龙参考2-converted.png`（主）与 `奶龙参考1.png`。
+- 验证：Demo 初始化测试通过；`clear_database` + `init_demo` 后项目 ID 1 含三张角色卡、描述空、各 2 张参考图。
+
+## 2026-09-28：角色布局删旧 A，重排 A–E 并加表情/动作 8 格
+
+- Owner：删无头三栏旧 A；旧 B/C/D 顺延为 A/B/C（默认 A=左脸右身）；新增 D 表情 8 格、E 动作 8 格；清库重建。
+- 同步 `assetOutputPromptAssembler`、前后端类型与下拉、`spec` / `AI漫画工作流`、相关脚本与测试。
+- 验证：后端相关测试全绿；`clear_database` + `init_demo` 重建空白奶龙1/2/3。
+
+## 2026-09-28：生图表单默认锁脸/禁字/4:3
+
+- Owner：资产卡打开时默认预选对应「锁脸/锁景/锁物」与「禁止出字」；资产页与分镜台画幅默认倾向 `4:3` 横屏（目录有则选，否则首项）；新建项目 metadata 同步 `4:3`。
+- `preferredAspectRatio` 优先 `4:3`；页面草稿仍可清空或改选。
+- 验证：前端 `catalog` 单测覆盖 4:3 优先。
+
+## 2026-09-28：资产页顶栏展示当前图片模型与价目
+
+- Owner：资产图工作区顶栏与分镜台对齐，在「返回项目」左侧展示当前图片预设；有公开价目时标题行附带 `¥`，点击可看能力与价目详情。
+- `ModelSummary` 支持 `title`（资产/底板文案），价目标签与 AI 配置同源 `modelPricingLabel`。
+
+## 2026-09-28：角色布局 F 叙事九宫格 + Demo 单卡
+
+- Owner：新增 `character-layout-f`（上排正面／侧面／背面，中排平淡／大狂笑／悲伤，下排挥手／坐下／奔跑）；Demo 收成仅「角色卡-奶龙-06」、无参考图、空 prompt。
+- 合同 `asset-output-pipeline-v20-nailong-nine-grid`；不自动生图。

@@ -239,7 +239,7 @@ async function main(): Promise<void> {
       "画幅要求：整张输出为横版 4:3 参考表（landscape），禁止竖版 9:16 / 9:21。";
     for (const asset of assetsBefore) {
       if (asset.kind === "character" && asset.name === "奶龙") {
-        const outputType = "character-layout-d" as const;
+        const outputType = "character-layout-c" as const;
         const inputRefs = stagedNailong.map((item) => item.publicUrl);
         const assembled = [
           assembleAssetOutputPrompt({

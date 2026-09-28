@@ -10,17 +10,19 @@ Google Gemini 原生多模态图像模型（Nano Banana 系列）。官方描述
 ## 模型 id 来源
 
 - **权威 id**：PearAPI `GET /v1/models`（如 `nano-banana-2-1k`、`nano-banana-2-2k`）。
+- **公开价目**：常见正式档为 `nano-banana-pro-1k/2k/4k`、`nano-banana-2-1k/2k/4k/lite`；裸 `nano-banana-pro` / `nano-banana-2` 可能只出现在目录。
 - **静态专栏**：可能只写到 `2` / `2-4k` / `lite`；目录清晰度档按同族补洞。
 
 ## 本专栏能力（同族继承）
 
 | 族 / 示例 model_id | 画幅（aspect_ratio） | 参考图上限 |
 | :--- | :--- | ---: |
-| `nano-banana-pro`、`nano-banana-pro-4k` | 9:16，16:9，1:1，2:3，3:2，3:4，4:3，4:5，5:4，21:9，1:4，4:1，1:8，8:1 | ≤ 14 |
+| `nano-banana-pro`、`nano-banana-pro-1k`、`nano-banana-pro-2k`、`nano-banana-pro-4k` | 9:16，16:9，1:1，2:3，3:2，3:4，4:3，4:5，5:4，21:9，1:4，4:1，1:8，8:1 | ≤ 14 |
 | `nano-banana-2`、`nano-banana-2-1k`、`nano-banana-2-2k`、`nano-banana-2-4k`、`nano-banana-2-lite` | 同上（14 种） | ≤ 14 |
 | `nano-banana` | 9:16，16:9，1:1，2:3，3:2，3:4，4:3，4:5，5:4，21:9 | ≤ 6 |
 
-模式：文生图与图生图均支持。
+模式：文生图与图生图均支持。  
+注意：价目偶发把基础 `nano-banana` 参考图写成 14；本仓仍以专栏核验的 ≤6 为准。
 
 ## 接口（本专栏）
 

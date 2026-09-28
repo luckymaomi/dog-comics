@@ -52,7 +52,7 @@ test('未选图片参考锁定时不组装锁定段', () => {
 
 test('选中锁脸后显式写入上传参考图数量与锁脸约束', () => {
   const prompt = assembleAssetOutputPrompt(
-    asset('character-layout-b', 'face', null, ['/static/uploads/a.png', '/static/uploads/b.png']),
+    asset('character-layout-a', 'face', null, ['/static/uploads/a.png', '/static/uploads/b.png']),
   );
   assert.match(
     prompt,
@@ -64,7 +64,7 @@ test('选中锁脸后显式写入上传参考图数量与锁脸约束', () => {
 });
 
 test('锁脸但尚无参考图时仍显式写出 0 张提示', () => {
-  const prompt = assembleAssetOutputPrompt(asset('character-layout-b', 'face'));
+  const prompt = assembleAssetOutputPrompt(asset('character-layout-a', 'face'));
   assert.match(prompt, /共 0 张；当前卡尚无输入参考图，生成前请先上传/u);
 });
 
@@ -94,4 +94,17 @@ test('选中禁止出字后写入锁定段之后、卡面文本之前', () => {
   );
   assert.match(prompt, /水印、招牌字、标签、气泡或其它可读字符/u);
   assert.match(prompt, /产出布局 A/u);
+  assert.match(prompt, /左脸右身/u);
+});
+
+test('表情 8 格、动作 8 格与叙事九宫格写入对应产出说明', () => {
+  const expression = assembleAssetOutputPrompt(asset('character-layout-d'));
+  assert.match(expression, /表情 8 格|捧腹大笑/u);
+  assert.match(expression, /眯成向下弯的缝|两排圆白牙|紧抱鼓起的大肚子/u);
+  assert.match(assembleAssetOutputPrompt(asset('character-layout-e')), /动作 8 格|挥手打招呼/u);
+  assert.match(
+    assembleAssetOutputPrompt(asset('character-layout-f')),
+    /叙事九宫格|3×3|正面全身|侧面全身|背面全身|平淡|悲伤|挥手|坐下|奔跑/u,
+  );
+  assert.doesNotMatch(assembleAssetOutputPrompt(asset('character-layout-f')), /惊恐|探头张望/u);
 });

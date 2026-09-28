@@ -59,7 +59,7 @@ npm.cmd run dev
 
 ### Demo 与清理
 
-空库可写入《奶龙后室》示例规格（不调用真实供应商）：
+空库可写入《奶龙多视图》示例规格（不调用真实供应商）：
 
 ```powershell
 python init_demo.py
