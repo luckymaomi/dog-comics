@@ -28,3 +28,7 @@ reference/*/
 # Local shallow clones of third-party AI manga / image / novel refs
 ref/*/
 
+
+# Local workflow run dumps (do not commit)
+workflow-run-evidence.json
+workflow-*.log
