@@ -10,6 +10,8 @@ export interface PanelRecipe {
 export interface StoryboardRecipeInput {
   shot: PanelRow;
   assets: ProjectAssetRow[];
+  /** 所引用分镜的当前底板 URL；仅当 shot.reference_panel_id 有值时使用。 */
+  referencePanelImageUrl?: string | null;
 }
 
 const PROFILE_FIELDS: Record<
@@ -21,17 +23,22 @@ const PROFILE_FIELDS: Record<
   prop: [["brief", "视觉描述"]],
 };
 
-/** 分镜组装：本镜画面 + 按出场资产 kind 的锁点段 + 干净画面约束；参考图只挂出场资产标准图与其他参考图。不注入总览画风锁、资产档案或资产出图提示词。 */
+/** 分镜组装：本镜画面 + 可选引用镜头锁点 + 按出场资产 kind 的锁点段 + 干净画面约束；参考图挂出场资产标准图、可选引用镜头底板与其他参考图。不注入总览画风锁、资产档案或资产出图提示词。 */
 export function assemblePanelRecipe({
   shot,
   assets,
+  referencePanelImageUrl,
 }: StoryboardRecipeInput): PanelRecipe {
   const assetById = new Map(assets.map((asset) => [asset.id, asset]));
   const selectedAssets = shot.project_asset_ids
     .map((id) => assetById.get(id))
     .filter((asset): asset is ProjectAssetRow => Boolean(asset));
+  const referencedUrl = shot.reference_panel_id
+    ? clean(referencePanelImageUrl)
+    : "";
   const references = unique([
     ...selectedAssets.map((asset) => asset.image_url),
+    referencedUrl || null,
     ...shot.extra_reference_images,
   ]);
   const beat =
@@ -39,13 +46,29 @@ export function assemblePanelRecipe({
     clean(shot.description) ||
     clean(shot.image_prompt) ||
     clean(shot.title);
+  const referenceLock = shot.reference_panel_id
+    ? buildReferencePanelLockBlock(Boolean(referencedUrl))
+    : "";
   const lockBlocks = selectedAssets.map(buildPanelAssetLockBlock);
   const imagePrompt = joinBlocks([
     beat,
+    referenceLock,
     ...lockBlocks,
     "干净画面；无字幕、无气泡、无水印",
   ]);
   return { panelRecipe: { prompt: imagePrompt, references: [...references] } };
+}
+
+export function buildReferencePanelLockBlock(hasImage: boolean): string {
+  if (hasImage) {
+    return "图片参考锁定（引用镜头）：基于所引用分镜的当前底板为构图与造型连续参考，img2img 图生图。保持角色身份、场景气质与画面衔接一致，在此基础上完成本镜变化。";
+  }
+  return "图片参考锁定（引用镜头）：已选择引用分镜，但该镜尚无底板；生成前请先产出被引用镜的底板，或清空引用。";
+}
+
+/** @deprecated 兼容旧名；请用 buildReferencePanelLockBlock */
+export function buildPreviousPanelLockBlock(hasImage: boolean): string {
+  return buildReferencePanelLockBlock(hasImage);
 }
 
 /** 按出场资产类型写入锁脸/锁景/锁物；锚点显式指向该卡当前标准图。组装结果即发给模型的文本，不含产品接线说明。 */

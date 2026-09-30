@@ -58,8 +58,9 @@ export class PanelRepository {
         `
       INSERT INTO panels (
         episode_id, panel_number, title, description, action,
-        image_prompt, image_recipe_prompt, image_recipe_references, extra_reference_images, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        image_prompt, image_recipe_prompt, image_recipe_references, extra_reference_images,
+        reference_panel_id, video_prompt, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
       )
       .run(
@@ -72,11 +73,23 @@ export class PanelRepository {
         promptValue(body.image_recipe_prompt, "分镜最终提示词必须是文本"),
         JSON.stringify(normalizeStringArray(body.image_recipe_references)),
         JSON.stringify(normalizeStringArray(body.extra_reference_images)),
+        null,
+        promptValue(body.video_prompt, "分镜视频提示词必须是文本"),
         now,
         now,
       );
     const id = Number(result.lastInsertRowid);
     this.syncPanelAssets(id, episode.drama_id, body.project_asset_ids);
+    const referencePanelId = this.resolveReferencePanelId(
+      episodeId,
+      id,
+      body.reference_panel_id,
+    );
+    if (referencePanelId !== null) {
+      this.db
+        .prepare(`UPDATE panels SET reference_panel_id = ? WHERE id = ?`)
+        .run(referencePanelId, id);
+    }
     const created = this.getPanel(id) as PanelRow;
     this.log?.audit?.("panel.created", { panel: created });
     return created;
@@ -94,6 +107,16 @@ export class PanelRepository {
       body.image_recipe_references === undefined
         ? current.image_recipe_references
         : normalizeStringArray(body.image_recipe_references);
+    const nextReferencePanelId = Object.prototype.hasOwnProperty.call(
+      body,
+      "reference_panel_id",
+    )
+      ? this.resolveReferencePanelId(
+          current.episode_id,
+          id,
+          body.reference_panel_id,
+        )
+      : current.reference_panel_id;
     const nextAssetIds = Object.prototype.hasOwnProperty.call(
       body,
       "project_asset_ids",
@@ -105,6 +128,7 @@ export class PanelRepository {
       body,
       extraReferences,
       nextAssetIds,
+      nextReferencePanelId,
     );
     const recipeSaved = hasCompleteRecipeSnapshot(body);
     this.db
@@ -112,7 +136,7 @@ export class PanelRepository {
         `
       UPDATE panels SET panel_number = ?, title = ?, description = ?, action = ?,
         image_prompt = ?, image_recipe_prompt = ?, image_recipe_references = ?, extra_reference_images = ?,
-        recipe_needs_reassembly = ?, updated_at = ?
+        reference_panel_id = ?, video_prompt = ?, recipe_needs_reassembly = ?, updated_at = ?
       WHERE id = ?
     `,
       )
@@ -130,6 +154,13 @@ export class PanelRepository {
         ),
         JSON.stringify(imageRecipeReferences),
         JSON.stringify(extraReferences),
+        nextReferencePanelId,
+        optionalPrompt(
+          body,
+          "video_prompt",
+          current.video_prompt,
+          "分镜视频提示词必须是文本",
+        ),
         recipeSaved
           ? 0
           : specificationChanged
@@ -259,6 +290,24 @@ export class PanelRepository {
       (id) => this.assets.getProjectAsset(id)?.drama_id === episode.drama_id,
     );
   }
+
+  /** 同话内另一镜；清空传 null／0／''；不可引用自己。 */
+  private resolveReferencePanelId(
+    episodeId: number,
+    selfId: number,
+    raw: unknown,
+  ): number | null {
+    if (raw === undefined) return null;
+    if (raw === null || raw === "" || raw === 0 || raw === "0") return null;
+    const id = readNumber(raw);
+    if (!id) throw new ValidationError("引用镜头 ID 无效");
+    if (id === selfId) throw new ValidationError("不能引用自己作为参考镜头");
+    const target = this.getPanel(id);
+    if (!target || target.episode_id !== episodeId) {
+      throw new ValidationError("引用镜头必须是同一话内的分镜");
+    }
+    return id;
+  }
 }
 
 export interface RawPanel
@@ -268,13 +317,16 @@ export interface RawPanel
     | "extra_reference_images"
     | "image_recipe_references"
     | "recipe_needs_reassembly"
+    | "reference_panel_id"
   > {
   extra_reference_images: string;
   image_recipe_references: string;
   recipe_needs_reassembly: number;
+  reference_panel_id?: number | null;
 }
 
 export function hydratePanelRow(db: SQLiteDatabase, row: RawPanel): PanelRow {
+  const refId = row.reference_panel_id;
   return {
     ...row,
     project_asset_ids: panelAssetRelationIds(db, row.id),
@@ -283,6 +335,11 @@ export function hydratePanelRow(db: SQLiteDatabase, row: RawPanel): PanelRow {
       row.image_recipe_references,
       [],
     ),
+    reference_panel_id:
+      typeof refId === "number" && Number.isInteger(refId) && refId > 0
+        ? refId
+        : null,
+    video_prompt: typeof row.video_prompt === "string" ? row.video_prompt : "",
     recipe_needs_reassembly: Boolean(row.recipe_needs_reassembly),
   };
 }
@@ -317,6 +374,7 @@ function panelSpecificationChanged(
   body: Record<string, unknown>,
   extraReferences: string[],
   assetIds: number[],
+  referencePanelId: number | null,
 ): boolean {
   if (
     STORYBOARD_SPECIFICATION_FIELDS.some(
@@ -331,10 +389,15 @@ function panelSpecificationChanged(
     !sameStrings(extraReferences, current.extra_reference_images)
   )
     return true;
+  if (referencePanelId !== current.reference_panel_id) return true;
   return (
     body.project_asset_ids !== undefined &&
     !sameNumbers(assetIds, current.project_asset_ids)
   );
+}
+
+function boolFlag(value: unknown): boolean {
+  return value === true || value === 1 || value === "1" || value === "on";
 }
 
 function hasCompleteRecipeSnapshot(body: Record<string, unknown>): boolean {

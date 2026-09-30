@@ -18,7 +18,9 @@ CREATE TABLE IF NOT EXISTS project_assets (
 CREATE TABLE IF NOT EXISTS panels (
   id INTEGER PRIMARY KEY AUTOINCREMENT, episode_id INTEGER NOT NULL REFERENCES episodes(id) ON DELETE CASCADE, panel_number INTEGER NOT NULL,
   title TEXT, description TEXT, action TEXT,
-  image_prompt TEXT, image_recipe_prompt TEXT NOT NULL DEFAULT '', image_recipe_references TEXT NOT NULL DEFAULT '[]', extra_reference_images TEXT NOT NULL DEFAULT '[]', recipe_needs_reassembly INTEGER NOT NULL DEFAULT 0,
+  image_prompt TEXT, image_recipe_prompt TEXT NOT NULL DEFAULT '', image_recipe_references TEXT NOT NULL DEFAULT '[]', extra_reference_images TEXT NOT NULL DEFAULT '[]',
+  reference_panel_id INTEGER REFERENCES panels(id) ON DELETE SET NULL, recipe_needs_reassembly INTEGER NOT NULL DEFAULT 0,
+  video_prompt TEXT NOT NULL DEFAULT '',
   image_url TEXT, current_image_generation_id INTEGER, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(episode_id, panel_number)
 );
 CREATE TABLE IF NOT EXISTS panel_project_assets (panel_id INTEGER NOT NULL REFERENCES panels(id) ON DELETE CASCADE, project_asset_id INTEGER NOT NULL REFERENCES project_assets(id) ON DELETE CASCADE, PRIMARY KEY(panel_id, project_asset_id));
@@ -41,6 +43,9 @@ export function initializeDatabase(database: SQLiteDatabase): void {
   database.exec(SCHEMA);
   ensureColumn(database, 'image_generations', 'archive_attempts', 'INTEGER NOT NULL DEFAULT 0');
   ensureColumn(database, 'provider_model_catalog', 'pricing', 'TEXT');
+  ensureColumn(database, 'panels', 'video_prompt', "TEXT NOT NULL DEFAULT ''");
+  ensureColumn(database, 'panels', 'reference_panel_id', 'INTEGER');
+  dropColumnIfExists(database, 'panels', 'use_previous_panel_image');
   dropColumnIfExists(database, 'panels', 'image_needs_review');
 }
 

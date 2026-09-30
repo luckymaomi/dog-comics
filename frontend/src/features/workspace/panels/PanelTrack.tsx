@@ -1,9 +1,15 @@
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Card, Empty, Typography } from "antd";
+import { PlusOutlined, ExportOutlined, ImportOutlined } from "@ant-design/icons";
+import { Button, Card, Empty, Space, Typography, Upload } from "antd";
 import type { Panel } from "../../../types/domain";
 import { mediaUrl } from "../../../utils/mediaUrl";
 
-export function PanelHeader(props: { episodeNumber: number; count: number }) {
+export function PanelHeader(props: {
+  episodeNumber: number;
+  count: number;
+  archiveBusy?: boolean;
+  onExportArchive?: () => void;
+  onImportArchive?: (file: File) => boolean | Promise<boolean>;
+}) {
   return (
     <div className="workspace-section-heading panel-heading">
       <div>
@@ -13,6 +19,29 @@ export function PanelHeader(props: { episodeNumber: number; count: number }) {
           {props.count > 0 ? ` · ${props.count} 镜` : ""}
         </Typography.Text>
       </div>
+      {props.onExportArchive && props.onImportArchive ? (
+        <Space wrap>
+          <Button
+            icon={<ExportOutlined />}
+            loading={props.archiveBusy}
+            onClick={() => void props.onExportArchive?.()}
+          >
+            导出 ZIP
+          </Button>
+          <Upload
+            accept=".zip,application/zip"
+            showUploadList={false}
+            beforeUpload={(file) => {
+              void props.onImportArchive?.(file);
+              return false;
+            }}
+          >
+            <Button icon={<ImportOutlined />} loading={props.archiveBusy}>
+              导入 ZIP
+            </Button>
+          </Upload>
+        </Space>
+      ) : null}
     </div>
   );
 }

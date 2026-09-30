@@ -1,6 +1,6 @@
 export const NAILONG_BACKROOMS_DEMO = {
   templateId: "nailong-backrooms-demo",
-  contract: "asset-output-pipeline-v20-nailong-nine-grid",
+  contract: "asset-output-pipeline-v21-classic-nine-and-expr-sixteen",
   project: {
     title: "奶龙",
     description: "",

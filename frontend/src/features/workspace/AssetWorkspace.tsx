@@ -1,9 +1,11 @@
 import {
   DownOutlined,
+  ExportOutlined,
+  ImportOutlined,
   PlusOutlined,
   SafetyCertificateOutlined,
 } from '@ant-design/icons'
-import { App, Button, Dropdown, Empty, Form, Space, Spin, Typography } from 'antd'
+import { App, Button, Dropdown, Empty, Form, Space, Spin, Typography, Upload } from 'antd'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { mediaHistoryApi, uploadsApi, type MediaGenerationHistory } from '../../api/media'
@@ -12,6 +14,7 @@ import { aiConfigsApi } from '../../api/aiConfigs'
 import { notifyAppError, notifyAppSuccess } from '../../errors/appError'
 import type { AssetKind, ProjectAsset, ProviderModel } from '../../types/domain'
 import { mediaUrl } from '../../utils/mediaUrl'
+import { downloadFileBase } from '../../utils/downloadName'
 import { useAnnounceGenerationOutcomes } from '../generation/useAnnounceGenerationOutcomes'
 import { assetImageKey, useGenerationTracker } from '../generation/useGenerationTracker'
 import { useProjectWorkspace } from './workspaceContext'
@@ -235,6 +238,43 @@ export function AssetWorkspace() {
     }
   }
 
+  const [archiveBusy, setArchiveBusy] = useState(false)
+
+  const exportArchive = async () => {
+    if (archiveBusy) return
+    try {
+      setArchiveBusy(true)
+      const blob = await workspaceApi.exportAssetArchive(project.id)
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = `${downloadFileBase(project.title, `project-${project.id}`)}-资产图存档.zip`
+      anchor.click()
+      URL.revokeObjectURL(url)
+      notifyAppSuccess(message, '已导出资产图 ZIP')
+    } catch (reason) {
+      notifyAppError({ message, modal }, reason)
+    } finally {
+      setArchiveBusy(false)
+    }
+  }
+
+  const importArchive = async (file: File) => {
+    if (archiveBusy) return false
+    try {
+      setArchiveBusy(true)
+      const result = await workspaceApi.importAssetArchive(project.id, file)
+      await load()
+      if (result.created[0]) setSelectedId(result.created[0].id)
+      notifyAppSuccess(message, `已导入 ${result.imported} 张资产图`)
+    } catch (reason) {
+      notifyAppError({ message, modal }, reason)
+    } finally {
+      setArchiveBusy(false)
+    }
+    return false
+  }
+
   const assemblePrompt = async () => {
     if (!selected || assemblingId === selected.id) return
     const assetId = selected.id
@@ -397,6 +437,12 @@ export function AssetWorkspace() {
           <Dropdown menu={{ items: kindItems, onClick: ({ key }) => void create(key as AssetKind) }}>
             <Button type="primary" icon={<PlusOutlined />}>新建资产卡 <DownOutlined /></Button>
           </Dropdown>
+          <Button icon={<ExportOutlined />} loading={archiveBusy} onClick={() => void exportArchive()}>
+            导出 ZIP
+          </Button>
+          <Upload accept=".zip,application/zip" showUploadList={false} beforeUpload={(file) => { void importArchive(file); return false }}>
+            <Button icon={<ImportOutlined />} loading={archiveBusy}>导入 ZIP</Button>
+          </Upload>
         </Space>
       </div>
 

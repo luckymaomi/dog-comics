@@ -52,28 +52,30 @@ export function PanelPreview(props: {
       }
     >
       {props.selected?.image_url ? (
-        <Image
-          src={mediaUrl(props.selected.image_url)}
-          alt={props.selected.title || "分镜底板"}
-          className="panel-preview-image"
-          preview={{
-            toolbarRender: (originalNode) => (
-              <>
-                {originalNode}
-                <Button
-                  type="text"
-                  icon={<DownloadOutlined />}
-                  href={mediaUrl(props.selected?.image_url ?? "")}
-                  download={`${props.selected?.title || `panel-${props.selected?.panel_number}`}-底板`}
-                  aria-label="下载底板"
-                  title="下载底板"
-                />
-              </>
-            ),
-          }}
-        />
+        <div className="panel-preview-stage">
+          <Image
+            src={mediaUrl(props.selected.image_url)}
+            alt={props.selected.title || "分镜底板"}
+            className="panel-preview-image"
+            preview={{
+              toolbarRender: (originalNode) => (
+                <>
+                  {originalNode}
+                  <Button
+                    type="text"
+                    icon={<DownloadOutlined />}
+                    href={mediaUrl(props.selected?.image_url ?? "")}
+                    download={`${props.selected?.title || `panel-${props.selected?.panel_number}`}-底板`}
+                    aria-label="下载底板"
+                    title="下载底板"
+                  />
+                </>
+              ),
+            }}
+          />
+        </div>
       ) : (
-        <div className="panel-preview-empty">
+        <div className="panel-preview-stage panel-preview-empty">
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="尚无底板" />
           <Typography.Text type="secondary">
             在右侧编辑规格后生成，或上传本地文件

@@ -95,7 +95,9 @@ export const outputTypeOptions: Record<AssetKind, Array<{ value: AssetOutputType
     { value: 'character-layout-c', label: 'C 7 图锚点组' },
     { value: 'character-layout-d', label: 'D 表情 8 格' },
     { value: 'character-layout-e', label: 'E 动作 8 格' },
-    { value: 'character-layout-f', label: 'F 叙事九宫格' },
+    { value: 'character-layout-f', label: 'F 经典九宫格' },
+    { value: 'character-layout-g', label: 'G 表情十六宫格' },
+    { value: 'character-layout-h', label: 'H 女装九宫格' },
   ],
   scene: [
     { value: 'scene-panorama', label: '空间全景' },

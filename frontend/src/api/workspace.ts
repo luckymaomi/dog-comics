@@ -131,6 +131,36 @@ export const workspaceApi = {
       { headers: { "Content-Type": "multipart/form-data" } },
     );
   },
+  exportAssetArchive: (projectId: number) =>
+    apiClient.get<never, Blob>(`/dramas/${projectId}/assets/archive`, {
+      responseType: "blob",
+    }),
+  importAssetArchive: (projectId: number, file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return apiClient.post<
+      never,
+      { created: ProjectAsset[]; imported: number; skipped: number }
+    >(`/dramas/${projectId}/assets/archive`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+  exportPanelArchive: (projectId: number, episodeId: number) =>
+    apiClient.get<never, Blob>(`/dramas/${projectId}/panels/archive`, {
+      params: { episode_id: episodeId },
+      responseType: "blob",
+    }),
+  importPanelArchive: (projectId: number, episodeId: number, file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return apiClient.post<
+      never,
+      { created: Panel[]; imported: number; skipped: number }
+    >(`/dramas/${projectId}/panels/archive`, form, {
+      params: { episode_id: episodeId },
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
   panels: (projectId: number, episodeId?: number) =>
     apiClient.get<never, PanelWorkspace>(`/dramas/${projectId}/panels`, {
       params: { episode_id: episodeId },

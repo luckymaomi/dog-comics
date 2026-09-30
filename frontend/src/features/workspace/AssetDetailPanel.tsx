@@ -14,6 +14,7 @@ import type { MediaGenerationHistory } from '../../api/media'
 import type { ProjectAsset } from '../../types/domain'
 import type { ProviderModel } from '../../types/domain'
 import { mediaUrl } from '../../utils/mediaUrl'
+import { assetOriginalDownloadName } from '../../utils/downloadName'
 import { GenerationElapsedTime } from '../generation/GenerationElapsedTime'
 import { assetGenerationStatus, type AssetGenerationState } from './assetGenerationStatus'
 import {
@@ -86,6 +87,8 @@ export function AssetDetailPanel({
   const watchedName = Form.useWatch('name', form)
   const watchedBrief = Form.useWatch(['text_profile', PROFILE_BRIEF_KEY], form)
   if (!selected) return <aside className="asset-detail-panel asset-detail-panel-empty"><span>选择一张资产卡查看详情</span></aside>
+  const displayName = (typeof watchedName === 'string' && watchedName.trim()) ? watchedName.trim() : selected.name
+  const originalDownloadName = assetOriginalDownloadName(displayName)
   const active = track?.status === 'pending' || track?.status === 'processing'
   const generateBlockedReason = !imageModel
     ? '请到 AI 配置手选图片预设'
@@ -136,12 +139,12 @@ export function AssetDetailPanel({
       <Form form={form} layout="vertical" className="asset-detail-form" onValuesChange={onDraftChange}>
         <div className="asset-standard-stage">
           {selected.image_url ? <>
-            <Image preview={{ toolbarRender: (originalNode) => <>{originalNode}<Button type="text" icon={<DownloadOutlined />} href={mediaUrl(selected.image_url)} download={`${selected.name || 'asset'}-原图`} aria-label="下载原图" title="下载原图" /></> }} src={mediaUrl(selected.image_url)} alt={selected.name} />
+            <Image preview={{ toolbarRender: (originalNode) => <>{originalNode}<Button type="text" icon={<DownloadOutlined />} href={mediaUrl(selected.image_url)} download={originalDownloadName} aria-label="下载原图" title="下载原图" /></> }} src={mediaUrl(selected.image_url)} alt={displayName} />
           </> : <div className="asset-standard-empty"><span>标准资产图</span><strong>还没有标准资产图</strong></div>}
           <AssetStatusBadge state={state} hasImage={Boolean(selected.image_url)} />
           <div className="asset-standard-status">
             <Tag color={selected.image_url ? 'green' : 'default'}>{selected.image_url ? '标准资产图' : '等待上传或生成'}</Tag>
-            {selected.image_url ? <Button size="small" icon={<DownloadOutlined />} href={mediaUrl(selected.image_url)} download={`${selected.name || 'asset'}-original`}>下载原图</Button> : null}
+            {selected.image_url ? <Button size="small" icon={<DownloadOutlined />} href={mediaUrl(selected.image_url)} download={originalDownloadName}>下载原图</Button> : null}
             <Upload showUploadList={false} accept="image/jpeg,image/png,image/gif,image/webp" customRequest={async ({ file, onSuccess, onError }) => {
               try { await onUploadStandard(file as File); onSuccess?.(file) } catch (reason) { onError?.(reason as Error) }
             }}><Button size="small" icon={<CloudUploadOutlined />}>上传标准图</Button></Upload>
@@ -210,7 +213,7 @@ export function AssetDetailPanel({
                 <Button size="small" type="text" danger disabled={!canManage} icon={<DeleteOutlined />} aria-label="删除这张标准图历史" />
               </Popconfirm>,
             ]}>
-            <List.Item.Meta avatar={item.image_url ? <Image width={48} height={48} src={mediaUrl(item.image_url)} preview={{ mask: '查看', toolbarRender: (originalNode) => <>{originalNode}<Button type="text" icon={<DownloadOutlined />} href={mediaUrl(item.image_url)} download={`asset-${item.id}-原图`} aria-label="下载原图" title="下载原图" /></> }} /> : undefined} title={<Space size={5}><Tag>{assetGenerationStatus({ status: item.status, message: item.error_msg ?? undefined }, Boolean(item.image_url)).label}</Tag><span>{item.provider === 'local-upload' ? '本地上传' : (item.provider ?? '未提交')}</span></Space>} description={item.status === 'pending' || item.status === 'processing' ? <GenerationElapsedTime startedAt={item.created_at} active progress={undefined} message="进行中" /> : item.status === 'failed' ? item.error_msg : item.prompt || '无提示词'} />
+            <List.Item.Meta avatar={item.image_url ? <Image width={48} height={48} src={mediaUrl(item.image_url)} preview={{ mask: '查看', toolbarRender: (originalNode) => <>{originalNode}<Button type="text" icon={<DownloadOutlined />} href={mediaUrl(item.image_url)} download={originalDownloadName} aria-label="下载原图" title="下载原图" /></> }} /> : undefined} title={<Space size={5}><Tag>{assetGenerationStatus({ status: item.status, message: item.error_msg ?? undefined }, Boolean(item.image_url)).label}</Tag><span>{item.provider === 'local-upload' ? '本地上传' : (item.provider ?? '未提交')}</span></Space>} description={item.status === 'pending' || item.status === 'processing' ? <GenerationElapsedTime startedAt={item.created_at} active progress={undefined} message="进行中" /> : item.status === 'failed' ? item.error_msg : item.prompt || '无提示词'} />
           </List.Item>
           }} />
         </section>

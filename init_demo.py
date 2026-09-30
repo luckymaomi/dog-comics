@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""初始化本地《奶龙》Demo（单卡叙事九宫格），不调用真实供应商。"""
+"""初始化本地《奶龙》Demo（单卡经典九宫格），不调用真实供应商。"""
 from __future__ import annotations
 
 import os

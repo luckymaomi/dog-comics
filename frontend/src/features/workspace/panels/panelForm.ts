@@ -23,6 +23,7 @@ export function panelPayload(values: PanelFormValues): Partial<Panel> {
   } = values;
   return {
     ...rest,
+    reference_panel_id: rest.reference_panel_id ?? null,
     project_asset_ids: [
       ...(character_asset_ids ?? []),
       ...(scene_asset_ids ?? []),

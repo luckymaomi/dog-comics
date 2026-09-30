@@ -64,7 +64,9 @@ export type CharacterOutputType =
   | 'character-layout-c'
   | 'character-layout-d'
   | 'character-layout-e'
-  | 'character-layout-f';
+  | 'character-layout-f'
+  | 'character-layout-g'
+  | 'character-layout-h';
 export type SceneOutputType = 'scene-panorama' | 'scene-detail' | 'scene-lighting-variant';
 export type PropOutputType = 'prop-multi-angle' | 'prop-state-variant';
 export type AssetOutputType = CharacterOutputType | SceneOutputType | PropOutputType;
@@ -100,6 +102,10 @@ export interface PanelRow {
   recipe_needs_reassembly?: boolean;
   project_asset_ids: number[];
   extra_reference_images: string[];
+  /** 可选：引用同一话内另一镜当前底板作为参考图；默认空。 */
+  reference_panel_id: number | null;
+  /** 视频生成提示词（仅展示与导出粘贴用，不调用视频接口）。 */
+  video_prompt: string;
   created_at: string;
   updated_at: string;
 }

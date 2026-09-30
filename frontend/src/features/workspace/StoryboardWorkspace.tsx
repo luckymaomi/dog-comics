@@ -16,6 +16,7 @@ import type {
   ProjectAsset,
   ProviderModel,
 } from "../../types/domain";
+import { downloadFileBase } from "../../utils/downloadName";
 import { useProjectWorkspace } from "./workspaceContext";
 import { useDebouncedAutoSave } from "./useDebouncedAutoSave";
 import { PanelHeader, PanelTrack } from "./panels/PanelTrack";
@@ -48,6 +49,7 @@ export function PanelWorkspace() {
   const [assembling, setAssembling] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [referenceUploading, setReferenceUploading] = useState(false);
+  const [archiveBusy, setArchiveBusy] = useState(false);
   const [activeCollapse, setActiveCollapse] = useState([
     "spec",
     "assets",
@@ -173,6 +175,7 @@ export function PanelWorkspace() {
     hydratingPanel.current = true;
     form.setFieldsValue({
       ...selected,
+      reference_panel_id: selected.reference_panel_id ?? undefined,
       action:
         selected.action ||
         selected.description ||
@@ -367,6 +370,45 @@ export function PanelWorkspace() {
     }
   };
 
+  const exportArchive = async () => {
+    if (archiveBusy) return;
+    try {
+      setArchiveBusy(true);
+      const blob = await workspaceApi.exportPanelArchive(project.id, episode.id);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${downloadFileBase(project.title, `project-${project.id}`)}-第${episode.episode_number}话-分镜存档.zip`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      notifyAppSuccess(message, "已导出分镜 ZIP");
+    } catch (reason) {
+      notifyAppError({ message, modal }, reason);
+    } finally {
+      setArchiveBusy(false);
+    }
+  };
+
+  const importArchive = async (file: File) => {
+    if (archiveBusy) return false;
+    try {
+      setArchiveBusy(true);
+      const result = await workspaceApi.importPanelArchive(
+        project.id,
+        episode.id,
+        file,
+      );
+      await loadPanels();
+      if (result.created[0]) setSelectedId(result.created[0].id);
+      notifyAppSuccess(message, `已导入 ${result.imported} 张分镜底板`);
+    } catch (reason) {
+      notifyAppError({ message, modal }, reason);
+    } finally {
+      setArchiveBusy(false);
+    }
+    return false;
+  };
+
   const deletePanel = async () => {
     if (!selected) return;
     try {
@@ -465,6 +507,9 @@ export function PanelWorkspace() {
       <PanelHeader
         episodeNumber={episode.episode_number}
         count={items.length}
+        archiveBusy={archiveBusy}
+        onExportArchive={() => void exportArchive()}
+        onImportArchive={importArchive}
       />
       <div className="panel-workbench-grid">
         <PanelTrack
@@ -485,6 +530,7 @@ export function PanelWorkspace() {
         <PanelInspector
           form={form}
           selected={selected}
+          panels={items}
           assets={assets}
           selectedAssetIds={selectedAssetIds}
           activeCollapse={activeCollapse}

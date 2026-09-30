@@ -4,7 +4,7 @@ import { assemblePanelRecipe } from '../src/services/storyboardPromptAssembler';
 import type { PanelRow, ProjectAssetRow } from '../src/types/domain';
 
 const panel = (overrides: Partial<PanelRow> = {}): PanelRow => ({
-  id: 1, episode_id: 1, panel_number: 1, title: '雾中的码头', description: '林岚在雾港码头发现一封信', action: '拆开信封', image_prompt: '电影感悬疑画面', image_recipe_prompt: '', image_recipe_references: [], image_url: null, current_image_generation_id: null, project_asset_ids: [7], extra_reference_images: ['https://cdn.test/pose.png'], created_at: '', updated_at: '', ...overrides,
+  id: 1, episode_id: 1, panel_number: 1, title: '雾中的码头', description: '林岚在雾港码头发现一封信', action: '拆开信封', image_prompt: '电影感悬疑画面', image_recipe_prompt: '', image_recipe_references: [], image_url: null, current_image_generation_id: null, project_asset_ids: [7], extra_reference_images: ['https://cdn.test/pose.png'], reference_panel_id: null, video_prompt: '', created_at: '', updated_at: '', ...overrides,
 });
 
 const character: ProjectAssetRow = {
@@ -76,4 +76,39 @@ test('空规格仍产出可执行的图片配方', () => {
     prompt: '一个人站在码头\n干净画面；无字幕、无气泡、无水印',
     references: ['https://cdn.test/light.png'],
   });
+});
+
+test('选择引用镜头时写入锁点并把该镜底板加入参考图', () => {
+  const result = assemblePanelRecipe({
+    shot: panel({
+      panel_number: 6,
+      action: '继续前行',
+      project_asset_ids: [7],
+      extra_reference_images: [],
+      reference_panel_id: 1,
+    }),
+    assets: [character],
+    referencePanelImageUrl: 'https://cdn.test/master-panel.png',
+  });
+  assert.match(result.panelRecipe.prompt, /图片参考锁定（引用镜头）：基于所引用分镜的当前底板/);
+  assert.deepEqual(result.panelRecipe.references, [
+    'https://cdn.test/linlan.png',
+    'https://cdn.test/master-panel.png',
+  ]);
+});
+
+test('已选引用镜头但尚无底板时写出提示且不塞空参考图', () => {
+  const result = assemblePanelRecipe({
+    shot: panel({
+      panel_number: 6,
+      action: '继续前行',
+      project_asset_ids: [],
+      extra_reference_images: [],
+      reference_panel_id: 1,
+    }),
+    assets: [],
+    referencePanelImageUrl: null,
+  });
+  assert.match(result.panelRecipe.prompt, /该镜尚无底板/);
+  assert.deepEqual(result.panelRecipe.references, []);
 });

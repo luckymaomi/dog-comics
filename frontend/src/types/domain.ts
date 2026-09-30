@@ -45,6 +45,10 @@ export interface Panel {
   recipe_needs_reassembly?: boolean;
   project_asset_ids?: number[];
   extra_reference_images?: string[];
+  /** 可选：引用同一话内另一镜当前底板作为参考。 */
+  reference_panel_id?: number | null;
+  /** 视频生成提示词（仅展示与粘贴，不调用视频接口）。 */
+  video_prompt?: string;
 }
 
 export type AssetKind = "character" | "scene" | "prop";
@@ -59,6 +63,8 @@ export type AssetOutputType =
   | "character-layout-d"
   | "character-layout-e"
   | "character-layout-f"
+  | "character-layout-g"
+  | "character-layout-h"
   | "scene-panorama"
   | "scene-detail"
   | "scene-lighting-variant"

@@ -97,14 +97,21 @@ test('选中禁止出字后写入锁定段之后、卡面文本之前', () => {
   assert.match(prompt, /左脸右身/u);
 });
 
-test('表情 8 格、动作 8 格与叙事九宫格写入对应产出说明', () => {
+test('表情 8 格、动作 8 格、经典九宫格与表情十六宫格写入对应产出说明', () => {
   const expression = assembleAssetOutputPrompt(asset('character-layout-d'));
   assert.match(expression, /表情 8 格|捧腹大笑/u);
   assert.match(expression, /眯成向下弯的缝|两排圆白牙|紧抱鼓起的大肚子/u);
   assert.match(assembleAssetOutputPrompt(asset('character-layout-e')), /动作 8 格|挥手打招呼/u);
-  assert.match(
-    assembleAssetOutputPrompt(asset('character-layout-f')),
-    /叙事九宫格|3×3|正面全身|侧面全身|背面全身|平淡|悲伤|挥手|坐下|奔跑/u,
-  );
-  assert.doesNotMatch(assembleAssetOutputPrompt(asset('character-layout-f')), /惊恐|探头张望/u);
+  const classicNine = assembleAssetOutputPrompt(asset('character-layout-f'));
+  assert.match(classicNine, /经典九宫格|3×3|正面全身|侧面全身|背面全身|平淡|悲伤|挥手|坐下|奔跑/u);
+  assert.doesNotMatch(classicNine, /惊恐|探头张望|①|叙事九宫格/u);
+  const sixteen = assembleAssetOutputPrompt(asset('character-layout-g'));
+  assert.match(sixteen, /表情十六宫格|4×4|鬼畜狂笑|悲伤含泪|暴怒|得意／坏笑/u);
+  assert.doesNotMatch(sixteen, /①|1–9/u);
+});
+
+test('女装九宫格写入对应产出说明', () => {
+  const female = assembleAssetOutputPrompt(asset('character-layout-h'));
+  assert.match(female, /女装九宫格|3×3|不知火舞|蒂法|兔女郎|魅魔|女骑士|沙漠舞娘|女教官|女海盗|春丽|自由发挥/u);
+  assert.doesNotMatch(female, /①|性感|暴露|得体|高开叉|开窗|比基尼/u);
 });

@@ -20,7 +20,7 @@ import { asyncRoute, bodyRecord, idParam } from "./http";
 
 type WorkspaceServices = Pick<
   ServiceContainer,
-  "projects" | "assets" | "images"
+  "projects" | "assets" | "images" | "assetArchive" | "panelArchive"
 >;
 
 export function workspaceRoutes(
@@ -29,10 +29,11 @@ export function workspaceRoutes(
 ): Router {
   const router = Router();
   const upload = createImageUpload(config);
+  const zipUpload = createZipUpload(config);
 
   registerScriptRoutes(router, services);
-  registerAssetRoutes(router, services, upload);
-  registerPanelRoutes(router, services, upload);
+  registerAssetRoutes(router, services, upload, zipUpload);
+  registerPanelRoutes(router, services, upload, zipUpload);
   return router;
 }
 
@@ -90,7 +91,34 @@ function registerAssetRoutes(
   router: Router,
   services: WorkspaceServices,
   upload: multer.Multer,
+  zipUpload: multer.Multer,
 ): void {
+  router.get("/dramas/:id/assets/archive", asyncRoute(async (req, res) => {
+    const result = await services.assetArchive.exportZip(idParam(req));
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename*=UTF-8''${encodeURIComponent(result.filename)}`,
+    );
+    res.setHeader("X-Potato-Exported", String(result.exported));
+    res.setHeader("X-Potato-Skipped", String(result.skipped));
+    res.send(result.buffer);
+  }));
+
+  router.post(
+    "/dramas/:id/assets/archive",
+    zipUpload.single("file"),
+    asyncRoute(async (req, res) => {
+      const projectId = idParam(req);
+      if (!req.file) throw new ValidationError("请选择资产图 ZIP");
+      try {
+        created(res, await services.assetArchive.importZip(projectId, req.file.path));
+      } finally {
+        await fs.promises.rm(req.file.path, { force: true });
+      }
+    }),
+  );
+
   router.get("/dramas/:id/assets", (req, res) => {
     success(res, {
       items: services.assets.listProjectAssets(
@@ -201,7 +229,46 @@ function registerPanelRoutes(
   router: Router,
   services: WorkspaceServices,
   upload: multer.Multer,
+  zipUpload: multer.Multer,
 ): void {
+  router.get("/dramas/:id/panels/archive", asyncRoute(async (req, res) => {
+    const projectId = idParam(req);
+    const episode = selectEpisode(
+      services.projects.require(projectId).episodes ?? [],
+      req.query.episode_id,
+    );
+    const result = await services.panelArchive.exportZip(projectId, episode.id);
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename*=UTF-8''${encodeURIComponent(result.filename)}`,
+    );
+    res.setHeader("X-Potato-Exported", String(result.exported));
+    res.setHeader("X-Potato-Skipped", String(result.skipped));
+    res.send(result.buffer);
+  }));
+
+  router.post(
+    "/dramas/:id/panels/archive",
+    zipUpload.single("file"),
+    asyncRoute(async (req, res) => {
+      const projectId = idParam(req);
+      const episode = selectEpisode(
+        services.projects.require(projectId).episodes ?? [],
+        req.query.episode_id ?? req.body?.episode_id,
+      );
+      if (!req.file) throw new ValidationError("请选择分镜 ZIP");
+      try {
+        created(
+          res,
+          await services.panelArchive.importZip(projectId, episode.id, req.file.path),
+        );
+      } finally {
+        await fs.promises.rm(req.file.path, { force: true });
+      }
+    }),
+  );
+
   router.get("/dramas/:id/panels", (req, res) => {
     const project = services.projects.require(idParam(req));
     const episode = selectEpisode(project.episodes ?? [], req.query.episode_id);
@@ -383,6 +450,28 @@ function createImageUpload(config: AppConfig): multer.Multer {
   });
 }
 
+function createZipUpload(config: AppConfig): multer.Multer {
+  const uploadDir = path.join(
+    path.resolve(config.storage?.local_path ?? "./data/storage"),
+    "uploads",
+  );
+  fs.mkdirSync(uploadDir, { recursive: true });
+  return multer({
+    storage: multer.diskStorage({
+      destination: (_req, _file, cb) => cb(null, uploadDir),
+      filename: (_req, _file, cb) => cb(null, `${randomUUID()}.zip`),
+    }),
+    limits: { fileSize: 256 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+      const ok =
+        /(?:application\/zip|application\/x-zip-compressed|multipart\/x-zip)$/iu.test(
+          file.mimetype,
+        ) || /\.zip$/iu.test(file.originalname);
+      cb(null, ok);
+    },
+  });
+}
+
 function selectEpisode(episodes: EpisodeRow[], raw: unknown): EpisodeRow {
   const id = Number(raw);
   const episode =
@@ -452,9 +541,13 @@ function saveAssembledPanelRecipe(
   projectId: number,
   panel: PanelRow,
 ): PanelRow {
+  const referenced = panel.reference_panel_id
+    ? services.assets.getPanel(panel.reference_panel_id)
+    : undefined;
   const recipe = assemblePanelRecipe({
     shot: panel,
     assets: services.assets.listProjectAssets(projectId),
+    referencePanelImageUrl: referenced?.image_url ?? null,
   });
   return services.assets.updatePanel(panel.id, {
     image_recipe_prompt: recipe.panelRecipe.prompt,

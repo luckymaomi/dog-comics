@@ -47,6 +47,7 @@ import { assetLabels, type PanelFormValues } from "./panelForm";
 export function PanelInspector(props: {
   form: ReturnType<typeof Form.useForm<PanelFormValues>>[0];
   selected?: Panel;
+  panels: Panel[];
   assets: ProjectAsset[];
   selectedAssetIds: number[];
   activeCollapse: string[];
@@ -123,7 +124,12 @@ export function PanelInspector(props: {
               {
                 key: "spec",
                 label: "分镜规格",
-                children: <PanelSpecFields />,
+                children: (
+                  <PanelSpecFields
+                    selectedId={props.selected.id}
+                    panels={props.panels}
+                  />
+                ),
               },
               {
                 key: "assets",
@@ -167,6 +173,20 @@ export function PanelInspector(props: {
             <GenerationControls {...props} />
           </section>
           <HistoryList items={props.history} onSelect={props.onSelectHistory} />
+          <section className="panel-video-prompt-section" aria-label="视频提示词">
+            <div className="asset-panel-heading">
+              <strong>视频提示词</strong>
+              <Typography.Text type="secondary">
+                整段可直接复制到外部视频模型；不调用本系统视频接口
+              </Typography.Text>
+            </div>
+            <Form.Item name="video_prompt" style={{ marginBottom: 0 }}>
+              <Input.TextArea
+                rows={14}
+                placeholder="先写：完全依据所附九宫格参考图。再写最多4个镜头的时间与运镜。不要写声音。"
+              />
+            </Form.Item>
+          </section>
         </Form>
       ) : (
         <Empty description="从左侧选择一个分镜" />
@@ -200,7 +220,23 @@ function PanelReadinessSummary(props: { readiness?: PanelReadiness }) {
   );
 }
 
-function PanelSpecFields() {
+function PanelSpecFields(props: {
+  selectedId?: number;
+  panels: Panel[];
+}) {
+  const options = props.panels
+    .filter((item) => item.id !== props.selectedId)
+    .map((item) => {
+      const label =
+        item.title?.trim() ||
+        item.action?.trim()?.slice(0, 24) ||
+        `镜${item.panel_number}`;
+      const hasImage = Boolean(item.image_url?.trim());
+      return {
+        value: item.id,
+        label: `${item.panel_number}. ${label}${hasImage ? "" : "（尚无底板）"}`,
+      };
+    });
   return (
     <>
       <Form.Item name="title" label="标题">
@@ -212,11 +248,24 @@ function PanelSpecFields() {
       <Form.Item
         name="action"
         label="本镜画面"
-        extra="写清这一镜要画什么：场景里谁在做什么、怎么站、大致景别与氛围。细节进资产卡；需要连续性时自行上传上一镜到底下「其他参考图」。"
+        extra="写清这一镜要画什么。出场角色／场景／道具在下方勾选资产卡，组装时会挂上对应标准图。"
       >
         <Input.TextArea
           autoSize={{ minRows: 4, maxRows: 12 }}
           placeholder="例：经典后室黄墙走廊中，奶龙捧腹狂笑，尽头隐约有笑影实体"
+        />
+      </Form.Item>
+      <Form.Item
+        name="reference_panel_id"
+        label="引用镜头"
+        extra="可选。组装／生成时把该镜当前底板并入参考图并写入引用锁点。可把总镜九宫格指给后面的单镜头。"
+      >
+        <Select
+          allowClear
+          placeholder="不引用其他镜头"
+          options={options}
+          optionFilterProp="label"
+          showSearch
         />
       </Form.Item>
     </>
@@ -287,7 +336,7 @@ function RecipeEditor(props: {
   return (
     <div className="panel-recipe-editor">
       <Typography.Paragraph type="secondary">
-        文本只拼本镜画面；图片挂出场资产标准图 + 其他参考图。不注入总览画风锁或资产卡档案。点「生成底板」会按当前规格自动组装；也可先点「组装图片配方」预览。
+        文本只拼本镜画面；图片挂出场资产标准图、可选上一镜底板与其他参考图。不注入总览画风锁或资产卡档案。点「生成底板」会按当前规格自动组装；也可先点「组装图片配方」预览。
       </Typography.Paragraph>
       <Form.Item name="image_recipe_prompt" label="最终图片提示词">
         <Input.TextArea rows={7} />
