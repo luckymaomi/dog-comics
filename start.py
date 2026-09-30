@@ -1,4 +1,4 @@
-"""Start the potato backend and frontend development servers."""
+"""Start the dog-comics backend and frontend development servers."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ FRONTEND_URL = "http://127.0.0.1:3012/"
 
 
 def fail(message: str) -> int:
-    print(f"[potato] {message}")
+    print(f"[dog-comics] {message}")
     if os.name == "nt":
         input("按回车退出...")
     return 1
@@ -52,8 +52,8 @@ def main() -> int:
     else:
         start_posix()
 
-    print("[potato] Backend: http://localhost:5679")
-    print(f"[potato] Frontend: {FRONTEND_URL}")
+    print("[dog-comics] Backend: http://localhost:5679")
+    print(f"[dog-comics] Frontend: {FRONTEND_URL}")
     webbrowser.open(FRONTEND_URL)
     return 0
 

@@ -10,7 +10,7 @@ import { createServices } from '../src/services/container';
 import type { AppConfig, Logger } from '../src/types/core';
 
 function setup() {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'potato-orphan-gen-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dog-comics-orphan-gen-'));
   const db = new Database(path.join(root, 'demo.db'));
   initializeDatabase(db);
   const config: AppConfig = {

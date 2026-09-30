@@ -14,7 +14,7 @@ const log: Logger = { info() {}, warn() {}, error() {}, audit() {} };
 test("video_prompt 可保存且不使图片配方过期", () => {
   const db = new Database(":memory:");
   initializeDatabase(db);
-  const storageRoot = fs.mkdtempSync(path.join(os.tmpdir(), "potato-video-prompt-"));
+  const storageRoot = fs.mkdtempSync(path.join(os.tmpdir(), "dog-comics-video-prompt-"));
   const config: AppConfig = {
     app: { name: "test", version: "1" },
     server: {},

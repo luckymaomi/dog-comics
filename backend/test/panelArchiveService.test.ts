@@ -20,7 +20,7 @@ after(() => roots.forEach((root) => fs.rmSync(root, { recursive: true, force: tr
 function setup() {
   const db = new Database(":memory:");
   initializeDatabase(db);
-  const storageRoot = fs.mkdtempSync(path.join(os.tmpdir(), "potato-panel-archive-"));
+  const storageRoot = fs.mkdtempSync(path.join(os.tmpdir(), "dog-comics-panel-archive-"));
   roots.push(storageRoot);
   const config: AppConfig = {
     app: { name: "test", version: "1" },

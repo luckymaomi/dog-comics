@@ -1,22 +1,22 @@
 <div align="center">
 
-# 土豆漫画
+# 狗狗漫画
 
 ### AI 漫画工作流
 
 人工剧本 → 项目资产卡与标准资产图 → 分镜台底板
 
-[当前产品事实](spec.md) · [协作规约](AGENTS.md) · [GitHub](https://github.com/luckymaomi/potato)
+[当前产品事实](spec.md) · [协作规约](AGENTS.md) · [GitHub](https://github.com/luckymaomi/dog-comics)
 
 <p>
-  <a href="https://github.com/luckymaomi/potato"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-potato-111827?logo=github"></a>
+  <a href="https://github.com/luckymaomi/dog-comics"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-dog--comics-111827?logo=github"></a>
   <img alt="Node.js" src="https://img.shields.io/badge/node-%3E%3D20.9-339933">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178C6">
   <img alt="React" src="https://img.shields.io/badge/React-18-149ECA?logo=react">
 </p>
 </div>
 
-土豆漫画把短剧素材收成一条可执行漫画工作流：先写清故事与剧本，再建可复用的项目资产卡并产出标准资产图，在分镜台逐镜组装并归档底板。
+狗狗漫画把短剧素材收成一条可执行漫画工作流：先写清故事与剧本，再建可复用的项目资产卡并产出标准资产图，在分镜台逐镜组装并归档底板。
 
 项目之间相互隔离。同一项目内的角色卡、场景卡、道具卡可按 ID 跨话复用。故事、剧本、资产卡与分镜规格由用户编辑与保存；生成只消费已保存的最终文本与引用快照。
 

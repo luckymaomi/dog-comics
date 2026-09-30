@@ -1,4 +1,4 @@
-# potato 变更记录
+# 狗狗漫画 变更记录
 
 > 硬规则：本文件严格按时间从前到后排列，最新历史只能追加到最下面；不得把新记录插入文件顶部，也不得删除既有历史。
 
@@ -921,3 +921,9 @@
 - 分镜台中间预览：`panel-preview-stage` 在可用区域内取正方形窗（`min(100cqw,100cqh)`）+ `object-fit: contain`，竖图无需滚动即可看全；预览区本体 `overflow: hidden`。
 - 产品侧一并落地（本轮一并提交）：资产／分镜 ZIP 存档服务与路由、`reference_panel_id`、`video_prompt` 字段与检查器、下载名工具；`故事1-分镜.md` 作规格备忘。
 - 未验证：浏览器人工确认预览无滚动；未部署。Owner 授权后 commit + push。
+
+## 2026-09-30：品牌改为狗狗漫画 / dog-comics
+
+- 产品显示名、包名、Skill、环境变量（`DOG_COMICS_*`）、HTTP 头、启动日志与文档统一为「狗狗漫画」／`dog-comics`；本地磁盘根目录仍为 `potato`（占用中不改）。
+- Git 远端改为 `https://github.com/luckymaomi/dog-comics.git`；favicon 由 owner 自更新为狗狗矢量图。
+- `history` 旧条目保留当时「土豆／potato」史实表述，不改写过往事实。

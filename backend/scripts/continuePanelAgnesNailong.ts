@@ -53,7 +53,7 @@ async function waitTask(
 
 async function main(): Promise<void> {
   const config = loadConfig();
-  configureAuditLog(process.env.POTATO_AUDIT_LOG_PATH?.trim() || undefined);
+  configureAuditLog(process.env.DOG_COMICS_AUDIT_LOG_PATH?.trim() || undefined);
   const db = getDb(config.database);
   try {
     initializeDatabase(db);

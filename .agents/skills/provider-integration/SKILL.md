@@ -1,6 +1,6 @@
 ---
 name: provider-integration
-description: 修改 potato 的 Agnes/PearAPI 适配器、模型目录、超时、限流重试、任务轮询或供应商进度时使用；不负责画布交互与本地归档指针。
+description: 修改 狗狗漫画 的 Agnes/PearAPI 适配器、模型目录、超时、限流重试、任务轮询或供应商进度时使用；不负责画布交互与本地归档指针。
 ---
 
 # Provider Integration

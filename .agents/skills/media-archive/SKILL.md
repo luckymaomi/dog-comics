@@ -1,6 +1,6 @@
 ---
 name: media-archive
-description: 修改 potato 的图片本地归档、generation 历史、版本选择、上传参考图时使用；生图成功后的 remote→本地指针切换以本 Skill 为准，不负责 Provider HTTP 协议细节。
+description: 修改 狗狗漫画 的图片本地归档、generation 历史、版本选择、上传参考图时使用；生图成功后的 remote→本地指针切换以本 Skill 为准，不负责 Provider HTTP 协议细节。
 ---
 
 # Media Archive

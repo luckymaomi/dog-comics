@@ -1,6 +1,6 @@
 ---
 name: provider-api-contract
-description: "维护并验证 potato 的 PearAPI/Agnes 生图 Provider API 协议、模型能力目录与适配器映射；修改 GPT Image、Nano Banana、Grok、Doubao Seedream、Agnes 生图请求或能力补洞时使用。"
+description: "维护并验证 狗狗漫画 的 PearAPI/Agnes 生图 Provider API 协议、模型能力目录与适配器映射；修改 GPT Image、Nano Banana、Grok、Doubao Seedream、Agnes 生图请求或能力补洞时使用。"
 ---
 
 # Provider API 协议合同（生图）

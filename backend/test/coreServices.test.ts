@@ -1,4 +1,4 @@
-﻿import assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -26,7 +26,7 @@ function setup(options: {
 } = {}) {
   const db = new Database(':memory:');
   initializeDatabase(db);
-  const storageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'potato-test-'));
+  const storageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dog-comics-test-'));
   roots.push(storageRoot);
   const config: AppConfig = {
     app: { name: 'test', version: '1' },

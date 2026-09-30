@@ -19,7 +19,7 @@ test('accept:nailong-backrooms-demo 只复用初始化入口，不保留供应�
 });
 
 test('半成品 Demo 会原位补齐为结构化漫画工作区且重复初始化不创建第二个项目', () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'potato-demo-init-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dog-comics-demo-init-'));
   const db = new Database(path.join(root, 'demo.db'));
   try {
     initializeDatabase(db);

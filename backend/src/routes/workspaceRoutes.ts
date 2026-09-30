@@ -100,8 +100,8 @@ function registerAssetRoutes(
       "Content-Disposition",
       `attachment; filename*=UTF-8''${encodeURIComponent(result.filename)}`,
     );
-    res.setHeader("X-Potato-Exported", String(result.exported));
-    res.setHeader("X-Potato-Skipped", String(result.skipped));
+    res.setHeader("X-Dog-Comics-Exported", String(result.exported));
+    res.setHeader("X-Dog-Comics-Skipped", String(result.skipped));
     res.send(result.buffer);
   }));
 
@@ -243,8 +243,8 @@ function registerPanelRoutes(
       "Content-Disposition",
       `attachment; filename*=UTF-8''${encodeURIComponent(result.filename)}`,
     );
-    res.setHeader("X-Potato-Exported", String(result.exported));
-    res.setHeader("X-Potato-Skipped", String(result.skipped));
+    res.setHeader("X-Dog-Comics-Exported", String(result.exported));
+    res.setHeader("X-Dog-Comics-Skipped", String(result.skipped));
     res.send(result.buffer);
   }));
 

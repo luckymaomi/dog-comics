@@ -1,7 +1,7 @@
 {
-  "name": "potato-backend",
+  "name": "dog-comics-backend",
   "version": "0.0.1",
-  "description": "TypeScript backend for potato",
+  "description": "TypeScript backend for dog-comics",
   "main": "dist/server.js",
   "scripts": {
     "start": "tsx src/server.ts",
