@@ -927,3 +927,9 @@
 - 产品显示名、包名、Skill、环境变量（`DOG_COMICS_*`）、HTTP 头、启动日志与文档统一为「狗狗漫画」／`dog-comics`；本地磁盘根目录仍为 `potato`（占用中不改）。
 - Git 远端改为 `https://github.com/luckymaomi/dog-comics.git`；favicon 由 owner 自更新为狗狗矢量图。
 - `history` 旧条目保留当时「土豆／potato」史实表述，不改写过往事实。
+
+## 2026-09-30：项目内新增极简配音区
+
+- 项目壳第四导航「配音」：文案 + 音色/风格下拉 + 生成试听/下载；不落库、不挂分镜。
+- 后端 `GET /freedub/options`、`POST /freedub/synthesize` 透传 PearAPI `https://api.pearapi.ai/api/freedub`；解析真实 `voicelist`/`stylelist` 对象；凭据复用 PearAPI `api_key`。
+- 验证：`freedubClient` 解析测；未做真实合成外部验收。

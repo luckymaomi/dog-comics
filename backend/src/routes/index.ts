@@ -2,6 +2,7 @@ import { Router } from 'express';
 import type { AppConfig } from '../types/core';
 import type { ServiceContainer } from '../services/container';
 import { aiConfigRoutes } from './aiConfigRoutes';
+import { freedubRoutes } from './freedubRoutes';
 import { mediaRoutes } from './mediaRoutes';
 import { projectRoutes } from './projectRoutes';
 import { taskRoutes } from './taskRoutes';
@@ -12,6 +13,7 @@ export function createApiRouter(services: ServiceContainer, config: AppConfig): 
   router.use(projectRoutes(services));
   router.use(workspaceRoutes(services, config));
   router.use(aiConfigRoutes(services));
+  router.use(freedubRoutes(services));
   router.use(mediaRoutes(services, config));
   router.use(taskRoutes(services));
   return router;

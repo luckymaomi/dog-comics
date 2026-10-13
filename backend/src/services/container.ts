@@ -3,6 +3,7 @@ import type { AppConfig, Logger, SQLiteDatabase } from '../types/core';
 import { AiConfigService } from './aiConfigService';
 import { AssetArchiveService } from './assetArchiveService';
 import { AssetRepository } from './assetRepository';
+import { FreedubService } from './freedubService';
 import { ImageGenerationService } from './imageGenerationService';
 import { MediaReferenceService } from './mediaReferenceService';
 import { MediaArchiveService } from './mediaArchiveService';
@@ -15,6 +16,7 @@ export interface ServiceContainer {
   assets: AssetRepository;
   assetArchive: AssetArchiveService;
   panelArchive: PanelArchiveService;
+  freedub: FreedubService;
   images: ImageGenerationService;
   projects: ProjectService;
   tasks: TaskService;
@@ -35,11 +37,13 @@ export function createServices(
   const images = new ImageGenerationService(db, mediaReferences, mediaArchive, aiConfigs, tasks, registry, log, assets);
   const assetArchive = new AssetArchiveService(db, assets, images, mediaArchive, config, log);
   const panelArchive = new PanelArchiveService(db, assets, images, mediaArchive, config, log);
+  const freedub = new FreedubService(config);
   return {
     aiConfigs,
     assets,
     assetArchive,
     panelArchive,
+    freedub,
     images,
     projects,
     tasks,

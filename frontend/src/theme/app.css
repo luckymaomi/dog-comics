@@ -305,6 +305,86 @@ button, input, textarea { font: inherit; }
 
 /* —— 剧本滚动（几何来自旧 index.css） —— */
 .script-workspace { min-height: 0; flex: 1; }
+.dubbing-workspace {
+  min-height: 0;
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+.dubbing-heading {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dubbing-heading h2 { margin: 0; }
+.dubbing-panel {
+  min-height: 0;
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: auto;
+}
+.dubbing-text-item {
+  flex: 1 1 auto;
+  min-height: 240px;
+  margin-bottom: 0 !important;
+  width: 100%;
+}
+.dubbing-text-item .ant-row {
+  display: block !important;
+  width: 100%;
+}
+.dubbing-text-item .ant-form-item-label,
+.dubbing-text-item .ant-form-item-control {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.dubbing-text-item .ant-form-item-control-input,
+.dubbing-text-item .ant-form-item-control-input-content {
+  width: 100%;
+}
+.dubbing-textarea {
+  width: 100% !important;
+  height: min(48vh, 420px) !important;
+  min-height: 240px !important;
+  resize: vertical !important;
+}
+.dubbing-select-row {
+  flex: none;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.dubbing-select-row .ant-form-item {
+  margin-bottom: 0 !important;
+  min-width: 0;
+}
+.dubbing-button-row {
+  flex: none;
+  width: 100%;
+}
+.dubbing-player-row {
+  flex: none;
+  width: 100%;
+}
+.dubbing-player-row audio {
+  width: 100%;
+  display: block;
+}
+@media (max-width: 720px) {
+  .dubbing-select-row { grid-template-columns: 1fr; }
+}
 .script-workspace-form {
   min-height: 0;
   flex: 1;

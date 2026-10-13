@@ -6,6 +6,7 @@ import { UiErrorBoundary } from './components/UiErrorBoundary'
 import { AiConfigPage } from './pages/AiConfigPage'
 import { ProjectsPage } from './pages/ProjectsPage'
 import { AssetWorkspace } from './features/workspace/AssetWorkspace'
+import { DubbingWorkspace } from './features/workspace/DubbingWorkspace'
 import { ProjectShell } from './features/workspace/ProjectShell'
 import { ScriptWorkspace } from './features/workspace/ScriptWorkspace'
 import { PanelWorkspace } from './features/workspace/StoryboardWorkspace'
@@ -54,6 +55,7 @@ function ThemedApp() {
                   <Route path="script" element={<ScriptWorkspace />} />
                   <Route path="assets" element={<AssetWorkspace />} />
                   <Route path="panels" element={<PanelWorkspace />} />
+                  <Route path="dubbing" element={<DubbingWorkspace />} />
                 </Route>
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,4 +1,4 @@
-import { ArrowLeftOutlined, BookOutlined, DeleteOutlined, EditOutlined, FolderOpenOutlined, MoonOutlined, PictureOutlined, SunOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, BookOutlined, DeleteOutlined, EditOutlined, FolderOpenOutlined, MoonOutlined, PictureOutlined, SoundOutlined, SunOutlined } from '@ant-design/icons'
 import { Alert, App, Button, Form, Input, Modal, Popconfirm, Select, Space, Spin } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -13,6 +13,7 @@ const tabs = [
   { path: 'script', label: '总览与剧本', icon: <BookOutlined /> },
   { path: 'assets', label: '资产图', icon: <FolderOpenOutlined /> },
   { path: 'panels', label: '分镜台', icon: <PictureOutlined /> },
+  { path: 'dubbing', label: '配音', icon: <SoundOutlined /> },
 ]
 
 export function ProjectShell() {
