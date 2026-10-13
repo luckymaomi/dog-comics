@@ -1,6 +1,5 @@
 import {
   CheckCircleOutlined,
-  DownloadOutlined,
   LeftOutlined,
   ReloadOutlined,
   RightOutlined,
@@ -8,6 +7,8 @@ import {
 } from "@ant-design/icons";
 import { Button, Card, Empty, Image, Space, Tag, Tooltip, Typography } from "antd";
 import type { Panel } from "../../../types/domain";
+import { imagePreviewWithPrompt } from "../../../components/ImagePreviewPrompt";
+import { downloadFileBase } from "../../../utils/downloadName";
 import { mediaUrl } from "../../../utils/mediaUrl";
 
 export function PanelPreview(props: {
@@ -57,21 +58,14 @@ export function PanelPreview(props: {
             src={mediaUrl(props.selected.image_url)}
             alt={props.selected.title || "分镜底板"}
             className="panel-preview-image"
-            preview={{
-              toolbarRender: (originalNode) => (
-                <>
-                  {originalNode}
-                  <Button
-                    type="text"
-                    icon={<DownloadOutlined />}
-                    href={mediaUrl(props.selected?.image_url ?? "")}
-                    download={`${props.selected?.title || `panel-${props.selected?.panel_number}`}-底板`}
-                    aria-label="下载底板"
-                    title="下载底板"
-                  />
-                </>
-              ),
-            }}
+            preview={imagePreviewWithPrompt({
+              prompt: props.selected.image_recipe_prompt,
+              mediaUrl: mediaUrl(props.selected.image_url),
+              downloadBase: `${downloadFileBase(
+                props.selected.title || `panel-${props.selected.panel_number}`,
+              )}-底板`,
+              emptyHint: "当前底板没有配方提示词",
+            })}
           />
         </div>
       ) : (

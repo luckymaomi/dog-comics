@@ -933,3 +933,15 @@
 - 项目壳第四导航「配音」：文案 + 音色/风格下拉 + 生成试听/下载；不落库、不挂分镜。
 - 后端 `GET /freedub/options`、`POST /freedub/synthesize` 透传 PearAPI `https://api.pearapi.ai/api/freedub`；解析真实 `voicelist`/`stylelist` 对象；凭据复用 PearAPI `api_key`。
 - 验证：`freedubClient` 解析测；未做真实合成外部验收。
+
+## 2026-10-13：原图下载锚定生成提示词
+
+- 本地归档成功后写入同基名 `{generationId}.prompt.txt`；删除 generation 时侧车一并删。
+- 资产「下载原图」与分镜「下载底板」同时导出 `.prompt.txt`（资产取当前/历史 generation 的 prompt，分镜取配方）。
+- 验证：侧车路径与落盘/删除单测；前端下载名单测。未做浏览器人手点通。
+
+## 2026-10-13：大图预览旁展示生成提示词
+
+- Owner 澄清：要的是点开大图预览时在旁边看到该次生成提示词，不是只靠下载侧车。
+- 资产标准图 / 历史缩略图 / 分镜底板预览用 `imageRender` 加侧栏展示 prompt，可复制；工具栏仍可下载原图+`.prompt.txt`。
+- 验证：前端 typecheck；未做浏览器人手点通。

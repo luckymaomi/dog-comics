@@ -13,3 +13,9 @@ export function downloadFileBase(name: string | undefined | null, fallback = 'as
 export function assetOriginalDownloadName(name: string | undefined | null): string {
   return `${downloadFileBase(name)}-原图`
 }
+
+/** 与原图文件名配对的提示词侧车：`角色卡-xxx-原图.prompt.txt` */
+export function promptSidecarDownloadName(downloadBase: string): string {
+  const base = downloadFileBase(downloadBase, 'media')
+  return `${base}.prompt.txt`
+}

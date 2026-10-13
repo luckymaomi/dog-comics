@@ -120,13 +120,42 @@ export class MediaArchiveService {
 
   async remove(relativePath: string): Promise<void> {
     await fs.promises.rm(this.absolutePath(relativePath), { force: true });
-    this.log?.audit?.('media.archive.removed', { relativePath });
+    const sidecar = promptSidecarRelativePath(relativePath);
+    if (sidecar !== relativePath) {
+      await fs.promises.rm(this.absolutePath(sidecar), { force: true }).catch(() => undefined);
+    }
+    this.log?.audit?.('media.archive.removed', { relativePath, promptSidecar: sidecar });
+  }
+
+  /** 生图归档后锚定本次发给模型的提示词，便于文件系统与导出追溯。 */
+  writePromptSidecar(mediaRelativePath: string, prompt: string): void {
+    const text = prompt.trim();
+    if (!text) return;
+    const sidecar = promptSidecarRelativePath(mediaRelativePath);
+    const destination = this.absolutePath(sidecar);
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.writeFileSync(destination, `${text}\n`, 'utf8');
+    this.log?.audit?.('media.archive.prompt_sidecar_written', {
+      mediaRelativePath,
+      promptSidecar: sidecar,
+      bytes: Buffer.byteLength(`${text}\n`, 'utf8'),
+    });
   }
 
   isAvailable(relativePath: string | null | undefined): boolean {
     if (!relativePath) return false;
     try { return fs.statSync(this.absolutePath(relativePath)).isFile(); } catch { return false; }
   }
+}
+
+/** `projects/1/images/12.png` → `projects/1/images/12.prompt.txt` */
+export function promptSidecarRelativePath(mediaRelativePath: string): string {
+  const normalized = mediaRelativePath.replace(/\\/gu, '/').replace(/^\/+/u, '');
+  const slash = normalized.lastIndexOf('/');
+  const dir = slash >= 0 ? normalized.slice(0, slash + 1) : '';
+  const file = slash >= 0 ? normalized.slice(slash + 1) : normalized;
+  const base = file.includes('.') ? file.replace(/\.[^.]+$/u, '') : file;
+  return `${dir}${base || 'media'}.prompt.txt`;
 }
 
 async function download(sourceUrl: string, kind: ArchivedMediaKind, limit: number, signal?: AbortSignal): Promise<Buffer> {

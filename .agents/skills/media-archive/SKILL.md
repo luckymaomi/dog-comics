@@ -11,11 +11,12 @@ description: 修改 狗狗漫画 的图片本地归档、generation 历史、版
 
 1. 供应商适配器返回图片 URL 后，`acceptRemote`：generation `status=remote`，`image_url`/`source_url` 指向远程；资产或分镜当前指针先挂远程（远程就是远程，无魔法）。
 2. 同任务内立即尝试一次本地归档；失败**不**抹远程预览，只记 `failure_stage=archive` 与 `archive_attempts`。
-3. `startArchiveRetryLoop` 有界重试：单次下载超时约 45s、最多 5 次；成功后 `status=completed`，指针切到 `/static/...`。`available` **仅**表示本地文件真实存在。
-4. 本地上传 / `importLocal` 直接 `completed`，不走 `remote`。
+3. `startArchiveRetryLoop` 有界重试：单次下载超时约 45s、最多 5 次；成功后 `status=completed`，指针切到 `/static/...`，并写入同基名 `{id}.prompt.txt` 侧车（本次发给模型的 `prompt`）。`available` **仅**表示本地媒体文件真实存在；删除 generation 时侧车一并删。
+4. 本地上传 / `importLocal` 直接 `completed`，不走 `remote`；同样写 prompt 侧车。
 5. 每次生成创建独立历史；选用只改指针。选用允许 `remote`（有 `image_url`）或已归档 `completed`。
-6. 服务重启：回收仍停在 `pending/processing` 的 `image_generations`（与已终态 `async_tasks` 对齐），避免「已有进行中任务」死锁。`remote` 记录继续由归档循环处理，**不**因重启标失败。
-7. 不存在「待复核」状态机或 `confirm-review`；无正式生产数据约束时禁止为旧列/旧 API 保留兼容壳。
+6. 前端大图预览侧栏展示该次 prompt（可复制）；「下载原图／底板」同时导出图片与 `.prompt.txt`。两者同源：DB 中该次 prompt / 分镜配方；磁盘侧车供离线追溯。
+7. 服务重启：回收仍停在 `pending/processing` 的 `image_generations`（与已终态 `async_tasks` 对齐），避免「已有进行中任务」死锁。`remote` 记录继续由归档循环处理，**不**因重启标失败。
+8. 不存在「待复核」状态机或 `confirm-review`；无正式生产数据约束时禁止为旧列/旧 API 保留兼容壳。
 
 ## 参考图
 

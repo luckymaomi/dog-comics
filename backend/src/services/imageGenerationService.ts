@@ -569,6 +569,15 @@ export class ImageGenerationService {
       }
     });
     commit();
+    try {
+      this.mediaArchive.writePromptSidecar(archived.relativePath, input.prompt);
+    } catch (error) {
+      this.log.audit?.('image.archive.prompt_sidecar_failed', {
+        generationId: id,
+        relativePath: archived.relativePath,
+        error,
+      });
+    }
     if (input.projectAssetId) this.assets.markAssetImageChanged(input.projectAssetId);
     if (input.panelId) this.assets.markPanelImageChanged(input.panelId);
   }

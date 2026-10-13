@@ -492,3 +492,76 @@ button, input, textarea { font: inherit; }
   .asset-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .episode-picker-row { width: 100%; align-items: stretch; flex-direction: column; }
 }
+
+/* 大图预览：图旁展示本次生成提示词 */
+.image-preview-with-prompt {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  width: min(96vw, 1280px);
+  max-height: min(86vh, 920px);
+  padding: 8px;
+  color: #e8eef2;
+}
+.image-preview-with-prompt-media {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  place-items: center;
+}
+.image-preview-with-prompt-media img {
+  max-width: 100%;
+  max-height: min(82vh, 880px);
+  object-fit: contain;
+}
+.image-preview-with-prompt-side {
+  flex: 0 0 min(360px, 34vw);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+  max-height: min(82vh, 880px);
+  padding: 12px;
+  text-align: left;
+  background: rgb(12 18 22 / 88%);
+  border: 1px solid rgb(180 198 210 / 28%);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+.image-preview-with-prompt-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+}
+.image-preview-with-prompt-side-head strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+.image-preview-with-prompt-side-head .ant-btn {
+  color: #d7e4ea !important;
+}
+.image-preview-with-prompt-text {
+  margin: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-align: left;
+  font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #d5e2e8;
+}
+@media (max-width: 760px) {
+  .image-preview-with-prompt {
+    flex-direction: column;
+    max-height: 92vh;
+  }
+  .image-preview-with-prompt-side {
+    flex: 0 0 auto;
+    max-height: 36vh;
+    min-width: 0;
+  }
+}

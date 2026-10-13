@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assetOriginalDownloadName, downloadFileBase } from './downloadName'
+import { assetOriginalDownloadName, downloadFileBase, promptSidecarDownloadName } from './downloadName'
 
 describe('downloadName', () => {
   it('用资产卡名称生成下载名，而不是 generation id', () => {
@@ -11,5 +11,9 @@ describe('downloadName', () => {
     expect(assetOriginalDownloadName('')).toBe('asset-原图')
     expect(assetOriginalDownloadName(null)).toBe('asset-原图')
     expect(downloadFileBase('a/b:c*d')).toBe('a_b_c_d')
+  })
+
+  it('提示词侧车与原图下载基名配对', () => {
+    expect(promptSidecarDownloadName('角色卡-奶龙-06-原图')).toBe('角色卡-奶龙-06-原图.prompt.txt')
   })
 })
