@@ -109,7 +109,7 @@ export function aspectRatiosFor(models: ProviderModel[], current?: string): stri
 
 export function preferredAspectRatio(aspectRatios: string[], current?: string): string | undefined {
   if (current && aspectRatios.includes(current)) return current
-  if (aspectRatios.includes('4:3')) return '4:3'
+  if (aspectRatios.includes('1:1')) return '1:1'
   return aspectRatios[0]
 }
 

@@ -122,7 +122,7 @@ export const banImageTextOptions: Array<{ value: ImageTextBanKind; label: string
   { value: 'ban', label: '禁止出字' },
 ]
 
-/** 打开资产卡时的表单默认：按类型预选锁脸/锁景/锁物、禁止出字；画幅默认由 preferredAspectRatio 倾向 4:3。 */
+/** 打开资产卡时的表单默认：按类型预选锁脸/锁景/锁物、禁止出字；画幅默认由 preferredAspectRatio 倾向 1:1。 */
 export const DEFAULT_BAN_IMAGE_TEXT: ImageTextBanKind = 'ban'
 
 export function defaultReferenceLock(kind: AssetKind): ReferenceLockKind {
